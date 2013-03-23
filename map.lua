@@ -96,9 +96,10 @@ end
 function map:draw(x,y,r, sx,sy, ox,oy, kx,ky)
 	local gx,gy,gx2,gy2= self.gx,self.gy,self.gx2,self.gy2
 	local iterator     = grid.iterate
+	ox,oy = ox or 0,oy or 0
 	if gx then iterator= grid.rectangle end
 	for gx,gy,sb in iterator(self,gx,gy,gx2,gy2,true) do
-		lg.draw(sb, x,y,r, sx,sy, (1-gx)*self.SBwidth,(1-gy)*self.SBheight, kx,ky)
+		lg.draw(sb, x,y,r, sx,sy, (1-gx)*self.SBwidth+ox,(1-gy)*self.SBheight+oy, kx,ky)
 	end
 end
 

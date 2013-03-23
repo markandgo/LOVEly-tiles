@@ -48,23 +48,28 @@ function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
 			local qx,qy   = atlas:getqViewport(index)
 			quads[v]      = quads[v] or lg.newQuad(qx,qy,qw,qh,atlas:getImageSize())
 			local quad    = quads[v]
+			-- real
+			local rx,ry= tw*(x-1),th*(y-1)
+			local gx,gy= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
+			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,qrows*qcols)
+			grid.set(self,gx,gy,sb)
+			local ox,oy= -(gx-1)*self.SBwidth,-(gy-1)*self.SBheight
+			local id   = sb:addq(quad,rx+ox,ry+oy)
 			local tiledata= {
-				sx     = 1,   sy= 1,
-				ox     = tw/2,oy= th/2,
-				angle  = 0,
 				visible= true,
+				quad   = quad,
+				sb     = sb,
+				id     = id,
+				
+				x      = rx,
+				y      = ry,
+				ox     = ox,
+				oy     = oy,
+				angle  = 0,
+				sx     = 1,   sy= 1,
+				cx     = tw/2,cy= th/2,
 				}
 			grid.set(self.tiledata,x,y,tiledata)
-			-- real
-			local rx,ry        = tw*(x-1),th*(y-1)
-			local gx,gy,gx2,gy2= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
-			for gx,gy,sb in grid.rectangle(self,gx,gy,gx2,gy2) do
-				local ox,oy= -(gx-1)*self.SBwidth,-(gy-1)*self.SBheight
-				sb         = sb or lg.newSpriteBatch(image,qrows*qcols)
-				grid.set(self,gx,gy,sb)
-				local id   = sb:addq(quad,rx+ox,ry+oy)
-				table.insert(tiledata,{quad = quad,sb = sb,id = id,x = rx,y = ry,ox = ox,oy = oy})
-			end
 		end
 	end
 	return setmetatable(self,map)
@@ -82,12 +87,9 @@ function map:getImage()
 end
 
 function map:setVisible(tx,ty,bool)
-	local tiledata = grid.get(self.tiledata,tx,ty)
-	local ox,oy,sx,sy,angle= tiledata.ox,tiledata.oy,tiledata.sx,tiledata.sy,tiledata.angle
-	for i,t in ipairs(tiledata) do
-		t.sb:setq(t.id,t.quad, t.x+t.ox+ox,t.y+t.oy+oy, 0, bool and 1*sx or 0,bool and 1*sy or 0, ox,oy)
-	end
-	tiledata.visible = bool
+	local t = grid.get(self.tiledata,tx,ty)
+	t.sb:setq(t.id,t.quad, t.x+t.ox+t.cx,t.y+t.oy+t.cy, t.angle, bool and t.sx or 0,bool and t.sy or 0, t.cx,t.cy)
+	t.visible = bool
 end
 
 function map:isVisible(tx,ty)
@@ -95,14 +97,12 @@ function map:isVisible(tx,ty)
 end
 
 function map:setFlip(tx,ty,flipx,flipy)
-	local tiledata         = grid.get(self.tiledata,tx,ty)
-	local ox,oy,sx,sy,angle= tiledata.ox,tiledata.oy,    flipx and -1 or 1,flipy and -1 or 1,   tiledata.angle
-	local vcoeff           = tiledata.visible and 1 or 0
-	for i,t in ipairs(tiledata) do
-		t.sb:setq( t.id,t.quad, t.x+t.ox+ox,t.y+t.oy+oy, angle, vcoeff*sx,vcoeff*sy, ox,oy)
-	end
-	tiledata.sx = sx
-	tiledata.sy = sy
+	local t       = grid.get(self.tiledata,tx,ty)
+	local vcoeff  = t.visible and 1 or 0
+	local sx,sy   = flipx and -1 or 1,flipy and -1 or 1
+	t.sb:setq( t.id,t.quad, t.x+t.ox+t.cx,t.y+t.oy+t.cy, t.angle, vcoeff*sx,vcoeff*sy, t.cx,t.cy)
+	t.sx = sx
+	t.sy = sy
 end
 
 function map:getFlip(tx,ty)
@@ -111,13 +111,10 @@ function map:getFlip(tx,ty)
 end
 
 function map:setAngle(tx,ty,angle)
-	local tiledata    = grid.get(self.tiledata,tx,ty)
-	local ox,oy,sx,sy = tiledata.ox,tiledata.oy,   tiledata.sx,tiledata.sy
-	local vcoeff      = tiledata.visible and 1 or 0
-	for i,t in ipairs(tiledata) do
-		t.sb:setq( t.id,t.quad, t.x+t.ox+ox,t.y+t.oy+oy, angle, vcoeff*sx,vcoeff*sy, ox,oy)
-	end
-	tiledata.angle = angle
+	local t       = grid.get(self.tiledata,tx,ty)
+	local vcoeff  = t.visible and 1 or 0
+	t.sb:setq( t.id,t.quad, t.x+t.ox+t.cx,t.y+t.oy+t.cy, angle, vcoeff*t.sx,vcoeff*t.sy, t.cx,t.cy)
+	t.angle = angle
 end
 
 function map:getAngle(tx,ty)

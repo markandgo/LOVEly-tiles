@@ -73,7 +73,15 @@ xxx xx x x x x x x x x x x x x x x x x x
 		
 	map2= map.new(sheet,sheetatlas,maptable,mapfunc, 32,32)
 	
-	map3= map.new(sheet,sheetatlas,mapdata1,mapfunc2, 17,17)
+	map3= map.new(sheet,sheetatlas,mapdata1,mapfunc2, 16,16)
+	
+	
+	-- flip a tile
+	map3:setFlip(1,1,true,true)
+	-- rotate a tile
+	map3:setAngle(2,1,3.14/2)
+	-- hide a tile
+	map3:setVisible(3,1,false)
 		
 	---------------------------------------------------------
 	---------------------------------------------------------	
@@ -131,7 +139,6 @@ function love.draw()
 		
 		-- draw slightly askewed and enlarge
 		map2:draw(0,300,3.14/10,2)
-		
 		
 		-- draw the happy face
 		map3:draw(500,300)

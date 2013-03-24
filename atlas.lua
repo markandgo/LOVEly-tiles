@@ -34,7 +34,6 @@ function atlas.new(imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasH
 	ah          = ah or ih
 	local dx,dy = sw/qw,ah/qh
 	assert(dx % 1 == 0 and dy % 1 == 0,'Dimensions of atlas must be multiples of dimensions of quads!')
-	local total = dx*dy
 	self.rows   = dy
 	self.columns= dx
 	self.qWidth = qw
@@ -42,14 +41,10 @@ function atlas.new(imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasH
 	self.iWidth = imageWidth
 	self.iHeight= imageHeight
 	
-	local counter = 0
 	for gx = 1,dx do 
 		for gy = 1,dy do
 			grid.set(self,gx,gy,quad((gx-1)*qw+ox,(gy-1)*qh+oy,qw,qh,iw,ih))
-			counter = counter + 1
-			if counter == total then break end
 		end
-		if counter == total then break end
 	end
 	return setmetatable(self,atlas)
 end

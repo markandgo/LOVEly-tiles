@@ -7,7 +7,6 @@ local md    = require (path..'mapdata')
 local ceil  = math.ceil
 local floor = math.floor
 local lg    = love.graphics
-local ipairs= ipairs
 
 local getSBrange = function(x,y,w,h,sw,sh)
 	local gx,gy  = floor(x/sw)+1,floor(y/sh)+1

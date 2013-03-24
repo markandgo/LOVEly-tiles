@@ -7,10 +7,10 @@ grid.lua
 	Generic grid class
 	
 mapdata.lua
-	mapdata.lua is an extenson of the grid class. It converts a string/table/image into a useable grid of values.
+	mapdata.lua is an extenson of the grid class. It converts a string/table/imageData into a useable grid of values.
 	
 map.lua
-	Uses an image,atlas,and mapdata to create a map object. A map object is a grid of spritebatch "chunks".
+	Uses an image,atlas,and mapdata/string/table/imageData to create a map object. A map object is a grid of spritebatch "chunks".
 	
 isomap.lua
 	This lib is a subclass of map. It loads/draws isometric maps. 

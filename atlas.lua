@@ -27,12 +27,12 @@ local atlas  = {}
 atlas.__index= atlas
 
 function atlas.new(imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight,ox,oy)
-	local iw,ih,qw,qh,aw,ah = imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasWidth
+	local iw,ih,qw,qh,aw,ah = imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight
 	local self  = grid.new()
 	ox,oy       = ox or 0,oy or 0
-	sw          = sw or iw
+	aw          = aw or iw
 	ah          = ah or ih
-	local dx,dy = sw/qw,ah/qh
+	local dx,dy = aw/qw,ah/qh
 	assert(dx % 1 == 0 and dy % 1 == 0,'Dimensions of atlas must be multiples of dimensions of quads!')
 	self.rows   = dy
 	self.columns= dx

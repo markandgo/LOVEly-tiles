@@ -14,6 +14,12 @@ local getSBrange = function(x,y,w,h,sw,sh)
 	return gx,gy,gx2,gy2
 end
 
+local newSB = function(image,chunksize)
+	local sb = lg.newSpriteBatch(image,chunksize)
+	sb:bind()
+	return sb 
+end
+
 local map   = {}
 map.__index = map
 
@@ -56,7 +62,7 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			local rx,ry= tw*(x-1),th*(y-1)
 			local gx,gy= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
 			
-			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,chunksize)
+			local sb   = grid.get(self,gx,gy) or newSB(image,chunksize)
 			grid.set(self,gx,gy,sb)
 			
 			local ox,oy= -(gx-1)*self.SBwidth,-(gy-1)*self.SBheight
@@ -79,6 +85,9 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 				
 			grid.set(self.tiledata,x,y,tiledata)
 		end
+	end
+	for x,y,sb in grid.iterate(self) do
+		sb:unbind()
 	end
 	return setmetatable(self,map)
 end

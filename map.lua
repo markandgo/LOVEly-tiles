@@ -18,11 +18,14 @@ end
 local map   = {}
 map.__index = map
 
-function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
+function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	local self   = grid.new()
-
-	local qw,qh  = atlas:getqSize()
+	
+	local qw2,qh2= atlas:getqSize()
+	qw,qh        = qw or qw2,qh or qh2
+	local iw,ih  = atlas:getImageSize()
 	tw,th        = tw or qw,th or qh
+	ox,oy        = ox or 0,oy or 0
 	
 	self.tiledata= grid.new()
 	self.image   = image
@@ -37,6 +40,7 @@ function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
 	assert(chunksize > 0,'Spritebatch chunk must be greater than 0!')
 	local qrows  = math.ceil(math.sqrt(chunksize))
 	local qcols  = qrows
+	chunksize    = qrows*qcols
 	self.SBwidth = qcols*tw
 	self.SBheight= qrows*th
 	local quads  = {}
@@ -47,13 +51,13 @@ function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
 		if index then
 			local qx,qy = atlas:getqViewport(index)
 			local qi    = qx..','..qy
-			quads[qi]   = quads[qi] or lg.newQuad(qx,qy,qw,qh,atlas:getImageSize())
+			quads[qi]   = quads[qi] or lg.newQuad(qx+ox,qy+oy,qw,qh,iw,ih)
 			local quad  = quads[qi]
 			-- real
 			local rx,ry= tw*(x-1),th*(y-1)
 			local gx,gy= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
 			
-			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,qrows*qcols)
+			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,chunksize)
 			grid.set(self,gx,gy,sb)
 			
 			local ox,oy= -(gx-1)*self.SBwidth,-(gy-1)*self.SBheight
@@ -71,7 +75,7 @@ function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
 				oy     = oy,
 				angle  = 0,
 				sx     = 1,   sy= 1,
-				cx     = tw/2,cy= th/2,
+				cx     = qw/2,cy= qh/2,
 				}
 				
 			grid.set(self.tiledata,x,y,tiledata)

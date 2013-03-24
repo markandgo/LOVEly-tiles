@@ -67,13 +67,12 @@ xxx xx x x x x x x x x x x x x x x x x x
 	
 	---------------------------------------------------------
 	---------------------------------------------------------
-	
-	-- tile spacing w = 16, h = 16
-	map1= map.new(sheet,sheetatlas,mapstring,mapfunc, 16,16)
-		
-	map2= map.new(sheet,sheetatlas,maptable,mapfunc, 32,32)
-	
-	map3= map.new(sheet,sheetatlas,mapdata1,mapfunc2, 16,16)
+	-- create our maps
+	map1= map.new(sheet,sheetatlas,mapstring,mapfunc)	
+	-- create a map: each tile has quad width = 16, quad height = 16
+	-- and horizontal spacing = 32, vertical spacing = 32
+	map2= map.new(sheet,sheetatlas,maptable,mapfunc, 0,0,16,16, 32,32)
+	map3= map.new(sheet,sheetatlas,mapdata1,mapfunc2, 0,0,16,16, 18,18)
 	
 	
 	-- flip a tile

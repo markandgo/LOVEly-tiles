@@ -50,9 +50,8 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	self.SBheight= qrows*th
 	local quads  = {}
 
-	local mapdata = data.grid and data or md.new(data)
-	for x,y,v in mapdata:iterate() do
-		local index = mapfunc(x,y,v)
+	for x,y, a,b,c,d in md.iterateData(data) do
+		local index = mapfunc(x,y,a,b,c,d)
 		if index then
 			local qx,qy = atlas:getqViewport(index)
 			local qi    = qx..','..qy

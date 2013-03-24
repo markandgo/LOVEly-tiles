@@ -11,3 +11,12 @@ mapdata.lua
 	
 map.lua
 	Uses an image,atlas,and mapdata to create a map object. A map object is a grid of spritebatch "chunks".
+	
+isomap.lua
+	This lib is a subclass of map. It loads/draws isometric maps. 
+	NOTE: 
+	+tx is down right,+ty is down left
+	tiles have width/height of 1 unit length in isometric coordinate
+	setViewport sets the viewport **IN ISOMETRIC WORLD**, e.g. setViewport(0,0,2,2) draws sprite batches found in the 4 unit area
+	The draw origin is located at the top corner of tile (1,1)
+	

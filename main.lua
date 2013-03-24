@@ -2,6 +2,7 @@ local gr= love.graphics
 atlas   = require 'atlas'
 map     = require 'map'
 mapdata = require 'mapdata'
+isomap  = require 'isomap'
 
 
 function love:load()
@@ -83,7 +84,61 @@ xxx xx x x x x x x x x x x x x x x x x x
 	map3:setVisible(3,1,false)
 		
 	---------------------------------------------------------
-	---------------------------------------------------------	
+	---------------------------------------------------------
+	-- build our isomap
+	
+	-- http://opengameart.org/content/isometric-64x64-outside-tileset
+	isosheet = gr.newImage('isotile.png')
+	
+-- +x goes down right in screen
+-- +y goes down left in screen 
+	isostring = [[
+xxxxxxxxxxxxxxxxxxxx
+ xxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxx
+ x x x x x x x x x x
+xxxxxxxxxxxxxxxxxxxx
+ x x x x x x x x x x
+xxxxxxxxxxxxxxxxxxxx
+ x x x x x x x x x x
+xxxxxxxxxxxxxxxxxxxx
+ x x x x x x x x x x
+xxxxxxxxxxxxxxxxxxxx
+
+]]
+	
+	isosheetatlas = atlas.new(640,1024,64,32)
+	
+	isomap1 = isomap.new(isosheet,isosheetatlas,isostring,function(x,y,char)
+		if char == 'x' then return {1,2} end
+	end,nil,nil,nil,nil)	
+		
+	---------------------------------------------------------
+	---------------------------------------------------------
+		
+	function render()
+		if not drawIso then
+			-- only render chunks in this range
+			map1:setViewport(x,y,800,600)
+			
+			-- omit arguments to draw everything
+			-- map1:setViewport()
+			
+			-- draw(x,y,r,sx,sy,ox,oy,kx,ky)
+			map1:draw(0,100)
+			
+			
+			-- draw slightly askewed and enlarge
+			map2:draw(0,400,3.14/10,2)
+			
+			-- draw the happy face
+			map3:draw(500,300)
+		else
+			-- draw at screen origin
+			isomap1:draw(0,0)
+		end
+	end	
+		
 		
 	x,y     = 0,0
 	vx,vy   = 0,0
@@ -91,6 +146,7 @@ xxx xx x x x x x x x x x x x x x x x x x
 end
 
 function love.keypressed(k)
+	if k == ' ' then drawIso = not drawIso end
 	if k == 'd' then
 		vx = velocity
 	end
@@ -124,38 +180,25 @@ function love.draw()
 	
 		gr.translate(-math.floor(x),-math.floor(y))
 		gr.rectangle('line',0,0,800,600)
-		
 	
-		-- only render chunks in this range
-		map1:setViewport(x,y,800,600)
+		render()
 		
-		-- omit arguments to draw everything
-		-- map1:setViewport()
-		
-		-- draw(x,y,r,sx,sy,ox,oy,kx,ky)
-		map1:draw(0,0)
-		
-		
-		-- draw slightly askewed and enlarge
-		map2:draw(0,300,3.14/10,2)
-		
-		-- draw the happy face
-		map3:draw(500,300)
-	
 	gr.pop()
 	
-	-- minimap showing chunks in view
-	gr.push()
-	
-		gr.translate(600,0)
-		gr.scale(0.25)
-		gr.rectangle('line',0,0,800,600)
+	if not drawIso then
+		-- minimap showing chunks in view
+		gr.push()
 		
+			gr.translate(600,0)
+			gr.scale(0.25)
+			gr.rectangle('line',0,0,800,600)
+			
+			render()
 		
-		map1:draw(0,0)
-		map2:draw(0,300,3.14/10,2)
-		map3:draw(500,300)
-	
-	gr.pop()
-	gr.rectangle('line',600,0,200,150)
+		gr.pop()
+		gr.rectangle('line',600,0,200,150)
+	end
+	gr.print('Press space to toggle iso or orthogonal drawing',0,0)
+	gr.print('Press WASD to move the screen',0,12)
+
 end

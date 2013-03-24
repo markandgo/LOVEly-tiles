@@ -64,7 +64,10 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 	-- tile length in isometric world = 1
 	-- +x direction: move down right
 	-- +y direction: move down left
-	for x,y, a,b,c,d in md.iterateData(data) do
+	local iterate = md.iterateData
+	if data.grid then iterate = md.iterate end
+	
+	for x,y, a,b,c,d in iterate(data) do
 		local index = mapfunc(x,y, a,b,c,d)
 		if index then
 			local qx,qy = atlas:getqViewport(index)

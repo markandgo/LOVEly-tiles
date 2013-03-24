@@ -49,8 +49,11 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	self.SBwidth = qcols*tw
 	self.SBheight= qrows*th
 	local quads  = {}
-
-	for x,y, a,b,c,d in md.iterateData(data) do
+	
+	local iterate = md.iterateData
+	if data.grid then iterate = md.iterate end
+	
+	for x,y, a,b,c,d in iterate(data) do
 		local index = mapfunc(x,y,a,b,c,d)
 		if index then
 			local qx,qy = atlas:getqViewport(index)

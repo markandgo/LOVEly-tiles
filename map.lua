@@ -45,16 +45,20 @@ function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
 	for x,y,v in mapdata:iterate() do
 		local index = mapfunc(x,y,v)
 		if index then
-			local qx,qy   = atlas:getqViewport(index)
-			quads[v]      = quads[v] or lg.newQuad(qx,qy,qw,qh,atlas:getImageSize())
-			local quad    = quads[v]
+			local qx,qy = atlas:getqViewport(index)
+			local qi    = qx..','..qy
+			quads[qi]   = quads[qi] or lg.newQuad(qx,qy,qw,qh,atlas:getImageSize())
+			local quad  = quads[qi]
 			-- real
 			local rx,ry= tw*(x-1),th*(y-1)
 			local gx,gy= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
+			
 			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,qrows*qcols)
 			grid.set(self,gx,gy,sb)
+			
 			local ox,oy= -(gx-1)*self.SBwidth,-(gy-1)*self.SBheight
 			local id   = sb:addq(quad,rx+ox,ry+oy)
+			
 			local tiledata= {
 				visible= true,
 				quad   = quad,
@@ -69,6 +73,7 @@ function map.new(image,atlas,data,mapfunc,tw,th,chunksize)
 				sx     = 1,   sy= 1,
 				cx     = tw/2,cy= th/2,
 				}
+				
 			grid.set(self.tiledata,x,y,tiledata)
 		end
 	end

@@ -40,19 +40,10 @@ xxx xx x x x x x x x x x x x x x x x x x
 	 {'-','-','-','-','-','-','-','-',},
 	}
 	
-	-- create a mapdata from an image data!
-	mapdata1 = mapdata.new(mapimage,function(x,y,r,g,b,a) 
-		-- return atlas index for desired tiles
-		if r == 255 and g == 251 then return 1 end
-		if r == 255 then return {2,1} end
-		if g == 255 then return {1,2} end
-		if b == 255 then return 4 end
-	end)
-	
 	---------------------------------------------------------
 	---------------------------------------------------------
 	
-	-- mapper callback 
+	-- mapper callback for maptable and mapstring
 	-- map a quad index in the atlas to a tile (x,y)
 	local mapfunc = function(x,y,v) 
 		if v == '-' then return 1
@@ -61,9 +52,13 @@ xxx xx x x x x x x x x x x x x x x x x x
 		elseif v == 'x' then return 4 end
 	end
 	
-	-- mapper callback for mapdata
-	local mapfunc2 = function(x,y,v)
-		return v
+	-- mapper callback for mapimage
+	local mapfunc2 = function(x,y,r,g,b,a) 
+		-- return atlas index for desired tiles
+		if r == 255 and g == 251 then return 1 end
+		if r == 255 then return {2,1} end
+		if g == 255 then return {1,2} end
+		if b == 255 then return 4 end
 	end
 	
 	---------------------------------------------------------
@@ -73,7 +68,7 @@ xxx xx x x x x x x x x x x x x x x x x x
 	-- create a map: each tile has quad width = 16, quad height = 16
 	-- and horizontal spacing = 32, vertical spacing = 32
 	map2= map.new(sheet,sheetatlas,maptable,mapfunc, 0,0,16,16, 32,32)
-	map3= map.new(sheet,sheetatlas,mapdata1,mapfunc2, nil,nil,nil,nil, 18,18)
+	map3= map.new(sheet,sheetatlas,mapimage,mapfunc2, nil,nil,nil,nil, 18,18)
 	
 	
 	-- flip a tile

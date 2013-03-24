@@ -24,7 +24,6 @@ function grid:rectangle(x,y,x2,y2,skipNil)
 		repeat
 			xi = xi+1
 			if xi > x2 then yi = yi + 1; xi = x end
-			assert(y2,'')
 			if yi > y2 then return end
 			local v = grid.get(self,xi,yi)
 			if v or not skipNil then

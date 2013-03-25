@@ -1,8 +1,8 @@
 local gr= love.graphics
-atlas   = require 'atlas'
-map     = require 'map'
-mapdata = require 'mapdata'
-isomap  = require 'isomap'
+atlas   = require 'lib.atlas'
+map     = require 'lib.map'
+mapdata = require 'lib.mapdata'
+isomap  = require 'lib.isomap'
 
 
 function love:load()

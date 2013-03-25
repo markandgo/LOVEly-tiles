@@ -7,7 +7,10 @@ function t.add(layer,i,isDrawable)
 	t.__isDrawable[layer] = isDrawable
 end
 
-t.add()
+function t.addObj(obj,i,pos)
+	i = i or #t.layers
+	table.insert(t.layers[i],pos or #t.layers[i]+1,obj)
+end
 
 function t.remove(i)
 	table.remove(t.layers,i)
@@ -73,11 +76,6 @@ end
 
 function t.isDrawable(i)
 	return t.__isDrawable[t.layers[i]].isDrawable
-end
-
-function t.addObj(obj,i,pos)
-	i = i or #t.layers
-	table.insert(t.layers[i],pos or #t.layers[i]+1,obj)
 end
 
 function t.draw(...)

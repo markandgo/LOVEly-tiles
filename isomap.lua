@@ -49,6 +49,8 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 	self.gy      = nil
 	self.gx2     = nil
 	self.gy2     = nil
+	self.SBrows  = 0
+	self.SBcols  = 0
 
 	chunksize    = chunksize or DEFAULT_CHUNK_SIZE
 	assert(chunksize > 0,'Spritebatch chunk must be greater than 0!')
@@ -77,6 +79,8 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 			-- real
 			local rx,ry= isoToScreen(x,y,qw,qh)
 			local gx,gy= getSBrange(x-1,y-1,1,1,self.SBwidth,self.SBheight)
+			self.SBrows= math.max(self.SBrows,gy)
+			self.SBcols= math.max(self.SBcols,gx)
 			
 			local sb   = grid.get(self,gx,gy) or newSB(image,chunksize)
 			grid.set(self,gx,gy,sb)
@@ -129,10 +133,9 @@ end
 
 function isomap:draw(x,y,r, sx,sy, ox,oy, kx,ky)
 	local gx,gy,gx2,gy2= self.gx,self.gy,self.gx2,self.gy2
-	local iterator     = grid.iterate
-	ox,oy = ox or 0,oy or 0
-	if gx then iterator= grid.rectangle end
-	for gx,gy,sb in iterator(self,gx,gy,gx2,gy2,true) do
+	ox,oy              = ox or 0,oy or 0
+	if not gx then gx,gy,gx2,gy2 = 1,1,self.SBcols,self.SBrows end
+	for gx,gy,sb in grid.rectangle(self,gx,gy,gx2,gy2,true) do
 		local ox2,oy2 = isoToScreen((gx-1)*self.SBwidth,(gy-1)*self.SBheight,self.qw,self.qh)
 		lg.draw(sb, x,y,r, sx,sy, ox-ox2+self.qw/2,oy-oy2, kx,ky)
 	end

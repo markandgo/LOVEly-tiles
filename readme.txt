@@ -1,4 +1,4 @@
-Tools for loading and rendering tile maps
+Tools for loading and rendering tile maps. See the demo branch for example.
 
 atlas.lua
 	Creates an atlas of quads for an image. Useful for animation or tile rendering

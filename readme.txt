@@ -20,3 +20,5 @@ isomap.lua
 	setViewport sets the viewport **IN ISOMETRIC WORLD**, e.g. setViewport(0,0,2,2) draws sprite batches found in the 4 unit area
 	The draw origin is located at the top corner of tile (1,1)
 	
+layer.lua
+	A generic drawing layer manager. It can sort,move,merge,or hide layers.

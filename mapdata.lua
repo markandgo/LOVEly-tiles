@@ -11,7 +11,7 @@ function md.new(data,func)
 	if type == 'userdata' and data:typeOf('ImageData') then
 		local colors = {}
 		func = func or function(x,y,r,g,b,a) 
-			local index   = r..','..g..','..b
+			local index   = r..','..g..','..b..','..a
 			colors[index] = colors[index] or {r= r,g= g,b= b,a= a}
 			return colors[index]
 		end

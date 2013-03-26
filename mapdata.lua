@@ -1,3 +1,6 @@
+local wrap  = coroutine.wrap
+local yield = coroutine.yield
+
 local path= (...):match('^.+%.') or ''
 local grid= require (path..'grid')
 local md  = grid.new()
@@ -35,8 +38,8 @@ function md.imageData(imageData)
 	end
 end
 
-function md.stringMap(string)
-	return coroutine.wrap(function()
+function md.string(string)
+	return wrap(function()
 		local y = 1
 		local x = 0
 		for char in string:gmatch('.') do
@@ -45,28 +48,48 @@ function md.stringMap(string)
 			else 
 				x = x + 1 
 				if char:match('[^%s]') then 
-					coroutine.yield(x,y,char)
+					yield(x,y,char)
 				end
 			end
 		end	
 	end)
 end
 
-function md.iterateData(data)
-	local type = type(data)
-	if type == 'userdata' and data:typeOf('ImageData') then
-		return md.imageData(data)
-	elseif type == 'string' then
-		return md.stringMap(data)
-	elseif type == 'table' then
-		return coroutine.wrap(function()
-			for y,t in pairs(data) do
-				for x,v in pairs(t) do
-					coroutine.yield(x,y,v)
-				end
+function md.array(array,w,h)
+	return wrap(function()
+		local x,y = 0,1
+		w,h       = w or array.width,h or array.height
+		for i,v in ipairs(array) do
+			x = x+1
+			if x > w then x = 1; y = y+1 end
+			yield(x,y,v)
+		end
+	end)
+end
+
+function md.grid(grid)
+	return wrap(function()
+		for y,t in pairs(grid) do
+			for x,v in pairs(t) do
+				yield(x,y,v)
 			end
-		end)
-	else 
+		end
+	end)
+end
+
+function md.iterateData(data,...)
+	local td = type(data)
+	if td == 'userdata' and data:typeOf('ImageData') then
+		return md.imageData(data)
+	elseif td == 'string' then
+		return md.string(data)
+	elseif td == 'table' then
+		if type(data[1]) == 'table' then
+			return md.grid(data)
+		else
+			return md.array(data,...)
+		end
+	else
 		error('Invalid map data!')
 	end
 end

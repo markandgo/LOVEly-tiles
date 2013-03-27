@@ -31,7 +31,7 @@ function t:removeAll()
 	self.layers = {}
 end
 
-function t.copy(i)
+function t:copy(i)
 	i        = i
 	local new= {}
 	for i,obj in ipairs(self.layers[i]) do

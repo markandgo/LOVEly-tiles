@@ -84,10 +84,10 @@ function md.iterateData(data,...)
 	elseif td == 'string' then
 		return md.string(data)
 	elseif td == 'table' then
-		if type(data[1]) == 'table' then
-			return md.grid(data)
-		else
+		if type(data[1]) == 'number' then
 			return md.array(data,...)
+		else
+			return md.grid(data)
 		end
 	else
 		error('Invalid map data!')

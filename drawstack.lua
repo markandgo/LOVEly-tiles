@@ -99,7 +99,7 @@ function t:setDrawable(i,bool)
 end
 
 function t:isDrawable(i)
-	return self.__isDrawable[self.layers[i]].isDrawable
+	return self.__isDrawable[self.layers[i]]
 end
 
 function t:draw(...)

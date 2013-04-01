@@ -77,15 +77,15 @@ function md.grid(grid)
 	end)
 end
 
-function md.iterateData(data,...)
+function md.iterateData(data)
 	local td = type(data)
 	if td == 'userdata' and data:typeOf('ImageData') then
 		return md.imageData(data)
 	elseif td == 'string' then
 		return md.string(data)
 	elseif td == 'table' then
-		if type(data[1]) == 'number' then
-			return md.array(data,...)
+		if type(data[1]) ~= 'table' then
+			return md.array(data,data.width,data.height)
 		else
 			return md.grid(data)
 		end

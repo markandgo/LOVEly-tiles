@@ -1,20 +1,29 @@
+local __setings = {__index = function(t,k) rawset(t,k,{}) return t[k] end,__mode= 'k'}
+
 local t   = {}
 t.__index = t
 
 function t.new()
 	local drawstack = {
-		layers      = {},
-		__isDrawable= setmetatable({},{__mode= 'k'}),
+		layers   = {},
+		settings = setmetatable({},__setings),
+		x        = 0,
+		y        = 0,
 	}
 	return setmetatable(drawstack,t)
 end
 
-function t:add(layer,i,isDrawable)
+function t:add(layer,i,xtransfactor,ytransfactor,isDrawable)
 	i           = i or #self.layers+1
 	layer       = layer or {}
 	isDrawable  = isDrawable or true
+	xtransfactor= xtransfactor or 0
+	ytransfactor= ytransfactor or xtransfactor
 	table.insert(self.layers,i,layer)
-	self.__isDrawable[layer] = isDrawable
+	local t        = self.settings[layer]
+	t.isDrawable   = isDrawable
+	t.xtransfactor = xtransfactor
+	t.ytransfactor = ytransfactor
 end
 
 function t:addObj(obj,i,pos)
@@ -95,21 +104,40 @@ end
 
 function t:setDrawable(i,bool)
 	if bool == nil then error('expected true or false for drawable') end
-	self.__isDrawable[self.layers[i]] = bool
+	self.settings[self.layers[i]].isDrawable = bool
 end
 
 function t:isDrawable(i)
-	return self.__isDrawable[self.layers[i]]
+	return self.settings[self.layers[i]].isDrawable
+end
+
+function t:translate(dx,dy)
+	self.x,self.y = self.x+dx,self.y+dy
+end
+
+function t:setTranslation(x,y)
+	self.x,self.y = x,y
+end
+
+function t:setTransFactors(i,xfactor,yfactor)
+	self.settings[self.layers[i]].xtransfactor = xfactor
+	self.settings[self.layers[i]].ytransfactor = yfactor or xfactor
 end
 
 function t:draw(...)
-	local isDrawable = self.__isDrawable
+	local set   = self.settings
 	for i,layer in ipairs(self.layers) do
-		if isDrawable[layer] then
+		love.graphics.push()
+		local xfactor = self.settings[layer].xtransfactor
+		local yfactor = self.settings[layer].ytransfactor
+		local dx,dy   = xfactor*self.x, yfactor*self.y
+		love.graphics.translate(dx,dy)
+		if set[layer].isDrawable then
 			for j,obj in ipairs(layer) do
 				obj:draw(...)
 			end
 		end
+		love.graphics.pop()
 	end
 end
 

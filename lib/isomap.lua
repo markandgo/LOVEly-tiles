@@ -21,9 +21,9 @@ local newSB = function(image,chunksize)
 	return sb 
 end
 
-local isoToScreen = function(ix,iy,qw,qh)
-	local x = (ix-1)*qw/2 - (iy-1)*qw/2
-	local y = (ix-1)*qh/2 + (iy-1)*qh/2
+local isoToScreen = function(ix,iy,tw,th)
+	local x = (ix-1)*tw/2 - (iy-1)*tw/2
+	local y = (ix-1)*th/2 + (iy-1)*th/2
 	return x,y
 end
 
@@ -31,18 +31,19 @@ end
 local isomap   = setmetatable({},map)
 isomap.__index = isomap
 
-function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
+function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	local self   = grid.new()
 	
 	local qw2,qh2= atlas:getqSize()
 	qw,qh        = qw or qw2,qh or qh2
+	tw,th        = tw or qw,th or qh
 	local iw,ih  = atlas:getImageSize()
 	ox,oy        = ox or 0,oy or 0
 	
 	self.tiledata= grid.new()
 	self.image   = image
-	self.qw      = qw
-	self.qh      = qh
+	self.tw      = tw
+	self.th      = th
 	self.SBwidth = nil
 	self.SBheight= nil
 	self.gx      = nil
@@ -77,7 +78,9 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 			quads[qi]   = quads[qi] or lg.newQuad(qx+ox,qy+oy,qw,qh,iw,ih)
 			local quad  = quads[qi]
 			-- real
-			local rx,ry= isoToScreen(x,y,qw,qh)
+			local rx,ry= isoToScreen(x,y,tw,th)
+			-- align to bottom left corner
+			rx,ry      = rx-(qw-tw),ry-(qh-th)
 			local gx,gy= getSBrange(x-1,y-1,1,1,self.SBwidth,self.SBheight)
 			self.SBrows= math.max(self.SBrows,gy)
 			self.SBcols= math.max(self.SBcols,gx)
@@ -89,9 +92,6 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 			drawlevel[level]   = drawlevel[level] or {level= level}
 			drawlevel[level][x]= y
 			
-			local ox,oy= isoToScreen( (gx-1)*self.SBwidth,(gy-1)*self.SBheight, qw,qh)
-			ox,oy      = -ox,-oy
-			
 			local tiledata= {
 				visible= true,
 				quad   = quad,
@@ -100,8 +100,6 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 				
 				x      = rx,
 				y      = ry,
-				ox     = ox,
-				oy     = oy,
 				angle  = 0,
 				sx     = 1,   sy= 1,
 				cx     = qw/2,cy= qh/2,
@@ -120,7 +118,7 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, chunksize)
 		t.level = nil
 		for x,y in pairs(t) do
 			local td = grid.get(self.tiledata,x,y)
-			td.id    = td.sb:addq(td.quad,td.x+td.ox,td.y+td.oy)
+			td.id    = td.sb:addq(td.quad,td.x,td.y)
 		end
 	end
 	
@@ -136,8 +134,7 @@ function isomap:draw(x,y,r, sx,sy, ox,oy, kx,ky)
 	ox,oy              = ox or 0,oy or 0
 	if not gx then gx,gy,gx2,gy2 = 1,1,self.SBcols,self.SBrows end
 	for gx,gy,sb in grid.rectangle(self,gx,gy,gx2,gy2,true) do
-		local ox2,oy2 = isoToScreen((gx-1)*self.SBwidth,(gy-1)*self.SBheight,self.qw,self.qh)
-		lg.draw(sb, x,y,r, sx,sy, ox-ox2+self.qw/2,oy-oy2, kx,ky)
+		lg.draw(sb, x,y,r, sx,sy, ox+self.tw/2,oy, kx,ky)
 	end
 end
 

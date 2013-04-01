@@ -65,10 +65,8 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			local gx,gy= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
 			
 			local sb   = grid.get(self,gx,gy) or newSB(image,chunksize)
-			grid.set(self,gx,gy,sb)
-			
-			local ox,oy= -(gx-1)*self.SBwidth,-(gy-1)*self.SBheight
-			local id   = sb:addq(quad,rx+ox,ry+oy)
+			grid.set(self,gx,gy,sb)			
+			local id   = sb:addq(quad,rx,ry)
 			
 			local tiledata= {
 				visible= true,
@@ -78,8 +76,6 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 				
 				x      = rx,
 				y      = ry,
-				ox     = ox,
-				oy     = oy,
 				angle  = 0,
 				sx     = 1,   sy= 1,
 				cx     = qw/2,cy= qh/2,
@@ -107,7 +103,7 @@ end
 
 function map:setVisible(tx,ty,bool)
 	local t = grid.get(self.tiledata,tx,ty)
-	t.sb:setq(t.id,t.quad, t.x+t.ox+t.cx,t.y+t.oy+t.cy, t.angle, bool and t.sx or 0,bool and t.sy or 0, t.cx,t.cy)
+	t.sb:setq(t.id,t.quad, t.x+t.cx,t.y+t.cy, t.angle, bool and t.sx or 0,bool and t.sy or 0, t.cx,t.cy)
 	t.visible = bool
 end
 
@@ -119,7 +115,7 @@ function map:setFlip(tx,ty,flipx,flipy)
 	local t       = grid.get(self.tiledata,tx,ty)
 	local vcoeff  = t.visible and 1 or 0
 	local sx,sy   = flipx and -1 or 1,flipy and -1 or 1
-	t.sb:setq( t.id,t.quad, t.x+t.ox+t.cx,t.y+t.oy+t.cy, t.angle, vcoeff*sx,vcoeff*sy, t.cx,t.cy)
+	t.sb:setq( t.id,t.quad, t.x+t.cx,t.y+t.cy, t.angle, vcoeff*sx,vcoeff*sy, t.cx,t.cy)
 	t.sx = sx
 	t.sy = sy
 end
@@ -132,7 +128,7 @@ end
 function map:setAngle(tx,ty,angle)
 	local t       = grid.get(self.tiledata,tx,ty)
 	local vcoeff  = t.visible and 1 or 0
-	t.sb:setq( t.id,t.quad, t.x+t.ox+t.cx,t.y+t.oy+t.cy, angle, vcoeff*t.sx,vcoeff*t.sy, t.cx,t.cy)
+	t.sb:setq( t.id,t.quad, t.x+t.cx,t.y+t.cy, angle, vcoeff*t.sx,vcoeff*t.sy, t.cx,t.cy)
 	t.angle = angle
 end
 
@@ -145,13 +141,12 @@ function map:setViewport(x,y,w,h)
 	self.gx,self.gy,self.gx2,self.gy2 = getSBrange(x,y,w,h,self.SBwidth,self.SBheight)
 end
 
-function map:draw(x,y,r, sx,sy, ox,oy, kx,ky)
+function map:draw(...)
 	local gx,gy,gx2,gy2= self.gx,self.gy,self.gx2,self.gy2
 	local iterator     = grid.iterate
-	ox,oy = ox or 0,oy or 0
 	if gx then iterator= grid.rectangle end
 	for gx,gy,sb in iterator(self,gx,gy,gx2,gy2,true) do
-		lg.draw(sb, x,y,r, sx,sy, (1-gx)*self.SBwidth+ox,(1-gy)*self.SBheight+oy, kx,ky)
+		lg.draw(sb, ...)
 	end
 end
 

@@ -11,7 +11,7 @@ function md.new(data,func)
 	if type == 'userdata' and data:typeOf('ImageData') then
 		local colors = {}
 		func = func or function(x,y,r,g,b,a) 
-			local index   = r..','..g..','..b
+			local index   = r..','..g..','..b..','..a
 			colors[index] = colors[index] or {r= r,g= g,b= b,a= a}
 			return colors[index]
 		end
@@ -77,17 +77,17 @@ function md.grid(grid)
 	end)
 end
 
-function md.iterateData(data,...)
+function md.iterateData(data)
 	local td = type(data)
 	if td == 'userdata' and data:typeOf('ImageData') then
 		return md.imageData(data)
 	elseif td == 'string' then
 		return md.string(data)
 	elseif td == 'table' then
-		if type(data[1]) == 'table' then
-			return md.grid(data)
+		if type(data[1]) ~= 'table' then
+			return md.array(data,data.width,data.height)
 		else
-			return md.array(data,...)
+			return md.grid(data)
 		end
 	else
 		error('Invalid map data!')

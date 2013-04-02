@@ -69,16 +69,18 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			local id   = sb:addq(quad,rx,ry)
 			
 			local tiledata= {
-				visible= true,
-				quad   = quad,
-				sb     = sb,
-				id     = id,
+				index   = type(index)== 'table' and ( atlas:getColumns()*(index[2]-1)  +  index[1] ) or index,
+				property= nil,
+				visible = true,
+				quad    = quad,
+				sb      = sb,
+				id      = id,
 				
-				x      = rx,
-				y      = ry,
-				angle  = 0,
-				sx     = 1,   sy= 1,
-				cx     = qw/2,cy= qh/2,
+				x       = rx,
+				y       = ry,
+				angle   = 0,
+				sx      = 1,   sy = 1,
+				cx      = qw/2,cy = qh/2,
 				}
 				
 			grid.set(self.tiledata,x,y,tiledata)
@@ -99,6 +101,18 @@ end
 
 function map:getImage()
 	return self.image
+end
+
+function map:getAtlasIndex(tx,ty)
+	return grid.get(self.tiledata,tx,ty).index
+end
+
+function map:setProperty(tx,ty,value)
+	grid.get(self.tiledata,tx,ty).property = value
+end
+
+function map:getProperty(tx,ty)
+	return grid.get(self.tiledata,tx,ty).property
 end
 
 function map:setVisible(tx,ty,bool)

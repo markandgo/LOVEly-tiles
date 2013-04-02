@@ -93,16 +93,18 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			drawlevel[level][x]= y
 			
 			local tiledata= {
-				visible= true,
-				quad   = quad,
-				sb     = sb,
-				id     = nil,
+				index   = type(index)== 'table' and ( atlas:getColumns()*(index[2]-1)  +  index[1] ) or index,
+				property= nil,
+				visible = true,
+				quad    = quad,
+				sb      = sb,
+				id      = nil,
 				
-				x      = rx,
-				y      = ry,
-				angle  = 0,
-				sx     = 1,   sy= 1,
-				cx     = qw/2,cy= qh/2,
+				x       = rx,
+				y       = ry,
+				angle   = 0,
+				sx      = 1,   sy    = 1,
+				cx      = qw/2,cy    = qh/2,
 				}
 				
 			grid.set(self.tiledata,x,y,tiledata)

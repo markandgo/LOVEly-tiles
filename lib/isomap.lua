@@ -6,19 +6,15 @@ local md    = require (path..'mapdata')
 local map   = require (path..'map')
 
 local ceil  = math.ceil
+local sqrt  = math.sqrt
 local floor = math.floor
+local max   = math.max
 local lg    = love.graphics
 
 local getSBrange = function(x,y,w,h,sw,sh)
 	local gx,gy  = floor(x/sw)+1,floor(y/sh)+1
 	local gx2,gy2= ceil((x+w)/sw),ceil((y+h)/sh)
 	return gx,gy,gx2,gy2
-end
-
-local newSB = function(image,chunksize)
-	local sb = lg.newSpriteBatch(image,chunksize)
-	sb:bind()
-	return sb 
 end
 
 local isoToScreen = function(ix,iy,tw,th)
@@ -52,16 +48,21 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	self.gy2     = nil
 	self.SBrows  = 0
 	self.SBcols  = 0
+	self.quads   = {}
+	self.ox      = ox
+	self.oy      = oy
+	self.qw      = qw
+	self.qh      = qh
+	self.atlas   = atlas
 
 	chunksize    = chunksize or DEFAULT_CHUNK_SIZE
-	assert(chunksize > 0,'Spritebatch chunk must be greater than 0!')
-	local rows   = math.ceil(math.sqrt(chunksize))
+	local rows   = ceil(sqrt(chunksize))
 	local cols   = rows
 	chunksize    = rows*cols
 	self.SBwidth = cols
 	self.SBheight= rows
 	
-	local quads     = {}
+	local quads     = self.quads
 	local drawlevel = {}
 	
 	-- tile length in isometric world = 1
@@ -82,10 +83,10 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			-- align to bottom left corner
 			rx,ry      = rx-(qw-tw),ry-(qh-th)
 			local gx,gy= getSBrange(x-1,y-1,1,1,self.SBwidth,self.SBheight)
-			self.SBrows= math.max(self.SBrows,gy)
-			self.SBcols= math.max(self.SBcols,gx)
+			self.SBrows= max(self.SBrows,gy)
+			self.SBcols= max(self.SBcols,gx)
 			
-			local sb   = grid.get(self,gx,gy) or newSB(image,chunksize)
+			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,chunksize)
 			grid.set(self,gx,gy,sb)
 			
 			local level        = x+y
@@ -93,16 +94,18 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			drawlevel[level][x]= y
 			
 			local tiledata= {
-				visible= true,
-				quad   = quad,
-				sb     = sb,
-				id     = nil,
+				index   = type(index)== 'table' and ( atlas:getColumns()*(index[2]-1)  +  index[1] ) or index,
+				property= nil,
+				visible = true,
+				quad    = quad,
+				sb      = sb,
+				id      = nil,
 				
-				x      = rx,
-				y      = ry,
-				angle  = 0,
-				sx     = 1,   sy= 1,
-				cx     = qw/2,cy= qh/2,
+				x       = rx,
+				y       = ry,
+				angle   = 0,
+				sx      = 1,   sy    = 1,
+				cx      = qw/2,cy    = qh/2,
 				}
 				
 			grid.set(self.tiledata,x,y,tiledata)
@@ -120,10 +123,6 @@ function isomap.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 			local td = grid.get(self.tiledata,x,y)
 			td.id    = td.sb:addq(td.quad,td.x,td.y)
 		end
-	end
-	
-	for x,y,sb in grid.iterate(self) do
-		sb:unbind()
 	end
 	
 	return setmetatable(self,isomap)

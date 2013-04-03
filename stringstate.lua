@@ -43,6 +43,11 @@ end
 
 function s:keypressed(k)
 	if k == ' ' then state = require 'tablestate' state:load() end
+	if type(tonumber(k)) == 'number' then
+		if tonumber(k) <= 4 then
+			map:setAtlasIndex(1,1,tonumber(k))
+		end
+	end
 	if k == 'd' then
 		vx = velocity
 	end
@@ -86,6 +91,7 @@ function s:draw()
 		render()	
 	gr.pop()
 	gr.rectangle('line',600,0,200,150)
+	gr.print('Press 1 to 4 to change tile',0,588)
 end
 
 return s

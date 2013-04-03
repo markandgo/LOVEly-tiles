@@ -5,6 +5,7 @@ local grid  = require (path..'grid')
 local md    = require (path..'mapdata')
 
 local ceil  = math.ceil
+local sqrt  = math.sqrt
 local floor = math.floor
 local lg    = love.graphics
 
@@ -14,10 +15,13 @@ local getSBrange = function(x,y,w,h,sw,sh)
 	return gx,gy,gx2,gy2
 end
 
-local newSB = function(image,chunksize)
-	local sb = lg.newSpriteBatch(image,chunksize)
-	sb:bind()
-	return sb 
+local getQuad = function(self,index)
+	local atlas   = self.atlas
+	local qx,qy   = atlas:getqViewport(index)
+	local qi      = qx..','..qy
+	local quad    = self.quads[qi] or lg.newQuad(qx+self.ox,qy+self.oy,self.qw,self.qh,atlas:getImageSize())
+	self.quads[qi]= quad   
+	return quad
 end
 
 local map   = {}
@@ -40,15 +44,19 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	self.gy      = nil
 	self.gx2     = nil
 	self.gy2     = nil
+	self.quads   = {}
+	self.ox      = ox
+	self.oy      = oy
+	self.qw      = qw
+	self.qh      = qh
+	self.atlas   = atlas
 
 	chunksize    = chunksize or DEFAULT_CHUNK_SIZE
-	assert(chunksize > 0,'Spritebatch chunk must be greater than 0!')
-	local qrows  = math.ceil(math.sqrt(chunksize))
+	local qrows  = ceil(sqrt(chunksize))
 	local qcols  = qrows
 	chunksize    = qrows*qcols
 	self.SBwidth = qcols*tw
 	self.SBheight= qrows*th
-	local quads  = {}
 	
 	local iterate = md.iterateData
 	if data.grid then iterate = md.iterate end
@@ -56,15 +64,12 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 	for x,y, a,b,c,d in iterate(data) do
 		local index = mapfunc(x,y,a,b,c,d)
 		if index then
-			local qx,qy = atlas:getqViewport(index)
-			local qi    = qx..','..qy
-			quads[qi]   = quads[qi] or lg.newQuad(qx+ox,qy+oy,qw,qh,iw,ih)
-			local quad  = quads[qi]
+			local quad = getQuad(self,index)
 			-- real
 			local rx,ry= tw*(x-1),th*(y-1)
 			local gx,gy= getSBrange(rx,ry,tw,th,self.SBwidth,self.SBheight)
 			
-			local sb   = grid.get(self,gx,gy) or newSB(image,chunksize)
+			local sb   = grid.get(self,gx,gy) or lg.newSpriteBatch(image,chunksize)
 			grid.set(self,gx,gy,sb)			
 			local id   = sb:addq(quad,rx,ry)
 			
@@ -82,12 +87,9 @@ function map.new(image,atlas,data,mapfunc, ox,oy,qw,qh, tw,th, chunksize)
 				sx      = 1,   sy = 1,
 				cx      = qw/2,cy = qh/2,
 				}
-				
+			
 			grid.set(self.tiledata,x,y,tiledata)
 		end
-	end
-	for x,y,sb in grid.iterate(self) do
-		sb:unbind()
 	end
 	return setmetatable(self,map)
 end
@@ -105,6 +107,15 @@ end
 
 function map:getAtlasIndex(tx,ty)
 	return grid.get(self.tiledata,tx,ty).index
+end
+
+function map:setAtlasIndex(tx,ty,index)
+	local quad    = getQuad(self,index)
+	local t       = grid.get(self.tiledata,tx,ty)
+	t.quad        = quad
+	t.index       = type(index)== 'table' and ( self.atlas:getColumns()*(index[2]-1)  +  index[1] ) or index
+	local vcoeff  = t.visible and 1 or 0
+	t.sb:setq( t.id, quad, t.x+t.cx,t.y+t.cy, t.angle, vcoeff*t.sx,vcoeff*t.sy, t.cx,t.cy)
 end
 
 function map:setProperty(tx,ty,value)

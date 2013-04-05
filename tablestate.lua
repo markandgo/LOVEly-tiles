@@ -4,6 +4,7 @@ local s = {name = 'table source'}
 function s:load()
 	atlas   = require 'lib.atlas'
 	map     = require 'lib.map'
+	md      = require 'lib.mapdata'
 
 
 	sheet = gr.newImage('tile.png')
@@ -18,14 +19,16 @@ function s:load()
 	 {'-','-','-','-','-','-','-','-',},
 	}
 	
-	local mapfunc = function(x,y,v) 
-		if v == '-' then return 1
-		elseif v == '@' then return 2
-		elseif v == 'q' then return 3
-		elseif v == 'x' then return 4 end
-	end
+	map = map.new(sheet,sheetatlas,18,18)	
 	
-	map = map.new(sheet,sheetatlas,mapsource,mapfunc,nil,nil,nil,nil,18,18)	
+	for x,y,v in md.grid(mapsource) do
+		local index
+		if v == '-' then index = 1
+		elseif v == '@' then index = 2
+		elseif v == 'q' then index = 3
+		elseif v == 'x' then index = 4 end
+		map:setAtlasIndex(x,y,index)
+	end
 		
 	x,y     = 0,0
 	vx,vy   = 0,0

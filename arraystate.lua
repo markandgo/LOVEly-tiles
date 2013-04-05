@@ -4,6 +4,7 @@ local s = {name = 'array source'}
 function s:load()
 	atlas   = require 'lib.atlas'
 	map     = require 'lib.map'
+	md      = require 'lib.mapdata'
 
 	sheet = gr.newImage('tile.png')
 	sheet:setFilter('linear','nearest')
@@ -17,14 +18,16 @@ function s:load()
 	'-','q','@','x',
 	}
 	
-	local mapfunc = function(x,y,v) 
-		if v == '-' then return 1
-		elseif v == '@' then return 2
-		elseif v == 'q' then return 3
-		elseif v == 'x' then return 4 end
-	end
+	map = map.new(sheet,sheetatlas)
 	
-	map = map.new(sheet,sheetatlas,mapsource,mapfunc)	
+	for x,y,v in md.array(mapsource) do
+		local index
+		if v == '-' then index = 1
+		elseif v == '@' then index = 2
+		elseif v == 'q' then index = 3
+		elseif v == 'x' then index = 4 end
+		map:setAtlasIndex(x,y,index)
+	end	
 	
 	x,y     = 0,0
 	vx,vy   = 0,0

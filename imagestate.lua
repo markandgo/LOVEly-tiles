@@ -4,6 +4,7 @@ local s = {name = 'image source'}
 function s:load()
 	atlas   = require 'lib.atlas'
 	map     = require 'lib.map'
+	md      = require 'lib.mapdata'
 
 	sheet = gr.newImage('tile.png')
 	sheet:setFilter('linear','nearest')
@@ -20,7 +21,12 @@ function s:load()
 		if b == 255 then return 4 end
 	end
 	
-	map = map.new(sheet,sheetatlas,mapsource,mapfunc)	
+	map = map.new(sheet,sheetatlas)	
+		
+	for x,y, r,g,b,a in md.imageData(mapsource) do
+		map:setAtlasIndex(x,y,mapfunc(x,y, r,g,b,a))
+	end	
+		
 		
 	x,y     = 0,0
 	vx,vy   = 0,0

@@ -12,6 +12,10 @@ function love.keyreleased(k)
 	state:keyreleased(k)
 end
 
+function love.mousepressed(x,y,b)
+	if state.mousepressed then state:mousepressed(x,y,b) end
+end
+
 function love.update(dt)
 	state:update(dt)
 end

@@ -4,11 +4,12 @@ local s = {name = 'isometric map'}
 function s:load()
 	atlas   = require 'lib.atlas'
 	isomap  = require 'lib.isomap'
+	md      = require 'lib.mapdata'
 
 	sheet = gr.newImage('isotile.png')
 	sheet:setFilter('linear','nearest')
 	
-	sheetatlas = atlas.new(640,1024,64,64)
+	sheetatlas = atlas.new(640,1024, 64,64, 640,1024, 0,64*3, 64,0)
 		
 	local mapsource =[[
 xxxxx  xxxx   xxxx   xxxxx
@@ -18,11 +19,15 @@ xxxxx  xxxx   xxxx   xxxxx
   x    xxxx   xxxx     x
 ]]
 	
-	local mapfunc = function(x,y,v) 
-		if v == 'x' then return 1 end
+	map = isomap.new(sheet,sheetatlas,64,32)	
+	
+	for x,y,v in md.string(mapsource) do
+		if v == 'x' then map:setAtlasIndex(x,y,3) end
 	end
 	
-	map = isomap.new(sheet,sheetatlas,mapsource,mapfunc,nil,nil,nil,nil,64,32)	
+	map:setFlip(1,1,true,false)
+	map:setAngle(5,1,3.14)
+	map:setAtlasIndex(3,1)
 		
 	x,y     = 0,0
 	vx,vy   = 0,0

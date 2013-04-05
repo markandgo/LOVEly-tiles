@@ -26,14 +26,16 @@ end
 local atlas  = {}
 atlas.__index= atlas
 
-function atlas.new(imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight,ox,oy)
-	local iw,ih,qw,qh,aw,ah = imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight
+function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,atlasHeight,  ox,oy,  xspacing,yspacing)
+	local iw,ih,qw,qh,aw,ah,xs,ys = imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight,xspacing,yspacing
 	local self  = grid.new()
 	ox,oy       = ox or 0,oy or 0
+	xs,ys       = xs or 0,ys or 0
 	aw          = aw or iw
 	ah          = ah or ih
-	local dx,dy = aw/qw,ah/qh
-	assert(dx % 1 == 0 and dy % 1 == 0,'Dimensions of atlas must be multiples of dimensions of quads!')
+	local tw,th = qw+xs,qh+ys
+	local dx,dy = aw/tw,ah/th
+	assert(dx % 1 == 0 and dy % 1 == 0,'Dimensions of atlas must be multiples of dimensions of quads + spacings!')
 	self.rows   = dy
 	self.columns= dx
 	self.qWidth = qw
@@ -43,7 +45,7 @@ function atlas.new(imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasH
 	
 	for gx = 1,dx do 
 		for gy = 1,dy do
-			grid.set(self,gx,gy,quad((gx-1)*qw+ox,(gy-1)*qh+oy,qw,qh,iw,ih))
+			grid.set(self,gx,gy,quad((gx-1)*tw+ox,(gy-1)*th+oy,qw,qh,iw,ih))
 		end
 	end
 	return setmetatable(self,atlas)

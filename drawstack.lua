@@ -40,15 +40,6 @@ function t:removeAll()
 	self.layers = {}
 end
 
-function t:copy(i)
-	i        = i
-	local new= {}
-	for i,obj in ipairs(self.layers[i]) do
-		new[i] = obj
-	end
-	table.insert(self.layers,i+1,new)
-end
-
 function t:swap(i,i2)
 	assert(self.layers[i] and self.layers[i2],'Cannot swap empty layer(s)!')
 	self.layers[i],self.layers[i2] = self.layers[i2],self.layers[i]

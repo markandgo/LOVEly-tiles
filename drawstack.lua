@@ -16,12 +16,11 @@ end
 function t:add(layer,i,xtransfactor,ytransfactor,isDrawable)
 	i           = i or #self.layers+1
 	layer       = layer or {}
-	isDrawable  = isDrawable or true
 	xtransfactor= xtransfactor or 0
 	ytransfactor= ytransfactor or xtransfactor
 	table.insert(self.layers,i,layer)
 	local t        = self.settings[layer]
-	t.isDrawable   = isDrawable
+	t.isDrawable   = isDrawable == nil and true or isDrawable
 	t.xtransfactor = xtransfactor
 	t.ytransfactor = ytransfactor
 end

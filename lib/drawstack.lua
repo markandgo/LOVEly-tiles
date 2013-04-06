@@ -50,44 +50,48 @@ function t:copy(i)
 end
 
 function t:swap(i,i2)
+	assert(self.layers[i] and self.layers[i2],'Cannot swap empty layer(s)!')
 	self.layers[i],self.layers[i2] = self.layers[i2],self.layers[i]
 end
 
 function t:move(i,direction)
 	assert(i > 0,'layer index cannot be less than 1')
+	local oi
 	if direction == 'down' then
-		direction = -1
+		oi = -1
 	elseif direction == 'up' then
-		direction = 1
+		oi = 1
 	else 
 		error('invalid direction value')
 	end
 	local layer     = self.layers[i]
-	local otherlayer= self.layers[i+direction]
-	if otherlayer then self.layers[i] = otherlayer; self.layers[i+direction]=layer end
+	local otherlayer= self.layers[i+oi]
+	assert(layer and otherlayer,'Cannot move layer out of sequence')
+	self.layers[i] = otherlayer; self.layers[i+oi]=layer
 end
 
 function t:merge(i,direction)
 	assert(i > 0,'layer index cannot be less than 1')
+	local oi
 	if direction == 'down' then
-		direction = -1
+		oi = -1
 	elseif direction == 'up' then
-		direction = 1
+		oi = 1
 	else 
 		error('invalid direction value')
 	end
 	local layer     = self.layers[i]
-	local otherlayer= self.layers[i+direction]
-	if otherlayer then 
-		for j,obj in ipairs(layer) do
-			if direction == 'up' then
-				table.insert(otherlayer,obj)
-			elseif direction == 'down' then
-				table.insert(otherlayer,obj)
-			end
+	local otherlayer= self.layers[i+oi]
+	if direction == 'up' then
+		for j = #layer,1,-1 do
+			table.insert(otherlayer,1,layer[j])
 		end
-		table.remove(self.layers,i)
+	else
+		for j = 1,#layer do
+			table.insert(otherlayer,layer[j])
+		end
 	end
+	table.remove(self.layers,i)
 end
 
 function t:sort(func)

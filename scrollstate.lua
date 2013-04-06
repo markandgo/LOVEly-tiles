@@ -5,13 +5,11 @@ function s:load()
 	ds    = require 'lib.drawstack'
 	
 	kirby = gr.newImage('kirby.png')
-	foreground = gr.newQuad(0,0,2495,167,3000,928)
-	background = gr.newQuad(988,694,248,212,3000,928)
+	foreground = gr.newQuad(6,419,577,216,787,641)
+	background = gr.newQuad(3,230,415,171,787,641)
 		
 	bg = {draw = function(self,...) 
-		for i = 1,5 do
-			gr.drawq(kirby,self.quad,(i-1)*248,0) 
-		end 
+		gr.drawq(kirby,self.quad,50,50) -- center on foreground
 	end,quad = background}
 	
 	fg = {draw = function(self,...) 
@@ -64,6 +62,7 @@ end
 
 function s:draw()
 	gr.push()
+	gr.translate(100,200) -- center on screen
 	gr.translate(-x,-y)
 	scene:draw()
 	gr.pop()

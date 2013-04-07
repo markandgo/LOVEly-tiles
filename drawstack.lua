@@ -78,9 +78,17 @@ function t:setTranslation(x,y)
 	self.x,self.y = x,y
 end
 
+function t:getTranslation()
+	return self.x,self.y
+end
+
 function t:setTransFactors(i,xfactor,yfactor)
 	self.settings[self.layers[i]].xtransfactor = xfactor
 	self.settings[self.layers[i]].ytransfactor = yfactor or xfactor
+end
+
+function t:getTransFactors(i)
+	return self.settings[self.layers[i]].xtransfactor, self.settings[self.layers[i]].ytransfactor
 end
 
 function t:draw(...)

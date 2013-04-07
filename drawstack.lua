@@ -15,7 +15,6 @@ end
 
 function t:add(layer,i,xtransfactor,ytransfactor,isDrawable)
 	i           = i or #self.layers+1
-	layer       = layer or {}
 	xtransfactor= xtransfactor or 0
 	ytransfactor= ytransfactor or xtransfactor
 	table.insert(self.layers,i,layer)
@@ -23,12 +22,6 @@ function t:add(layer,i,xtransfactor,ytransfactor,isDrawable)
 	t.isDrawable   = isDrawable == nil and true or isDrawable
 	t.xtransfactor = xtransfactor
 	t.ytransfactor = ytransfactor
-end
-
-function t:addObj(obj,i,pos)
-	i   = i or #self.layers
-	pos = pos or #self.layers[i]+1
-	table.insert(self.layers[i],pos,obj)
 end
 
 function t:remove(i)
@@ -60,36 +53,8 @@ function t:move(i,direction)
 	self.layers[i] = otherlayer; self.layers[i+oi]=layer
 end
 
-function t:merge(i,direction)
-	assert(i > 0,'layer index cannot be less than 1')
-	local oi
-	if direction == 'down' then
-		oi = -1
-	elseif direction == 'up' then
-		oi = 1
-	else 
-		error('invalid direction value')
-	end
-	local layer     = self.layers[i]
-	local otherlayer= self.layers[i+oi]
-	if direction == 'up' then
-		for j = #layer,1,-1 do
-			table.insert(otherlayer,1,layer[j])
-		end
-	else
-		for j = 1,#layer do
-			table.insert(otherlayer,layer[j])
-		end
-	end
-	table.remove(self.layers,i)
-end
-
 function t:sort(func)
 	table.sort(self.layers,func)
-end
-
-function t:sortObj(i,func)
-	table.sort(self.layers[i],func)
 end
 
 function t:totalLayers()
@@ -127,9 +92,7 @@ function t:draw(...)
 		local dx,dy   = xfactor*self.x, yfactor*self.y
 		love.graphics.translate(dx,dy)
 		if set[layer].isDrawable then
-			for j,obj in ipairs(layer) do
-				obj:draw(...)
-			end
+			layer:draw(...)
 		end
 		love.graphics.pop()
 	end

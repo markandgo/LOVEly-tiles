@@ -8,21 +8,20 @@ function s:load()
 	foreground = gr.newQuad(6,419,577,216,787,641)
 	background = gr.newQuad(3,230,415,171,787,641)
 		
-	bg = {draw = function(self,...) 
-		gr.drawq(kirby,self.quad,50,50) -- center on foreground
-	end,quad = background}
+	local layer1 = {}	
+	layer1.draw = function(self,...) 
+		gr.drawq(kirby,background,50,50)
+	end
 	
-	fg = {draw = function(self,...) 
-		gr.drawq(kirby,self.quad,0,0) 
-	end,quad = foreground}
+	local layer2 = {}
+	layer2.draw = function(self,...) 
+		gr.drawq(kirby,foreground,0,0) 
+	end
 	
 	scene = ds.new()
 	
-	scene:add(nil,1,1/2)
-	scene:add(nil,2)
-	
-	scene:addObj(bg,1)
-	scene:addObj(fg,2)
+	scene:add(layer1,1,1/2)
+	scene:add(layer2,2)
 	
 	x,y     = 0,0
 	vx,vy   = 0,0

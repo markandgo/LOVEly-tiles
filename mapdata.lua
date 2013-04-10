@@ -3,26 +3,7 @@ local yield = coroutine.yield
 
 local path= (...):match('^.+%.') or ''
 local grid= require (path..'grid')
-local md  = grid.new()
-md.__index= md
-
-function md.new(data,func)
-	local self = grid.new()
-	if type == 'userdata' and data:typeOf('ImageData') then
-		local colors = {}
-		func = func or function(x,y,r,g,b,a) 
-			local index   = r..','..g..','..b..','..a
-			colors[index] = colors[index] or {r= r,g= g,b= b,a= a}
-			return colors[index]
-		end
-	else
-		func = func or function(x,y,v) return v end
-	end
-	for x,y, a,b,c,d in md.iterateData(data) do
-		grid.set(self,x,y,func(x,y,a,b,c,d))
-	end
-	return setmetatable(self,md)
-end
+local md  = {}
 
 function md.imageData(imageData)
 	local w,h      = imageData:getHeight(), imageData:getWidth()
@@ -75,23 +56,6 @@ function md.grid(grid)
 			end
 		end
 	end)
-end
-
-function md.iterateData(data)
-	local td = type(data)
-	if td == 'userdata' and data:typeOf('ImageData') then
-		return md.imageData(data)
-	elseif td == 'string' then
-		return md.string(data)
-	elseif td == 'table' then
-		if type(data[1]) ~= 'table' then
-			return md.array(data,data.width,data.height)
-		else
-			return md.grid(data)
-		end
-	else
-		error('Invalid map data!')
-	end
 end
 
 return md

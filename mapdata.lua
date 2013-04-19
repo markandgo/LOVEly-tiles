@@ -1,9 +1,9 @@
 local wrap  = coroutine.wrap
 local yield = coroutine.yield
 
-local path= (...):match('^.+%.') or ''
-local grid= require (path..'grid')
-local md  = {}
+local path  = (...):match('^.+[%.\\/]') or ''
+local grid  = require (path..'grid')
+local md    = {}
 
 function md.imageData(imageData)
 	local w,h      = imageData:getHeight(), imageData:getWidth()

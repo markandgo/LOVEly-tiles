@@ -1,6 +1,6 @@
 local PREALLOCATE_SB_SIZE = 256
 
-local path  = (...):match('^.+%.') or ''
+local path  = (...):match('^.+[%.\\/]') or ''
 local grid  = require (path..'grid')
 
 local ceil  = math.ceil
@@ -55,6 +55,10 @@ end
 
 local map   = {}
 map.__index = map
+
+map.__call = function(self,tx,ty)
+	return self.tiledata.grid[tx][ty].property
+end
 
 function map.new(image,atlas, tw,th)
 	local self   = grid.new()

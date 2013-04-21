@@ -1,6 +1,10 @@
 local grid  = {}
 grid.__index= grid
 
+grid.__call = function(self,x,y)
+	return self.grid[x][y]
+end
+
 grid.new = function()
 	return setmetatable({grid = {}},grid)
 end

@@ -1,6 +1,6 @@
 local PREALLOCATE_SB_SIZE = 256
 
-local path  = (...):match('^.+%.') or ''
+local path  = (...):match('^.+[%.\\/]') or ''
 local grid  = require (path..'grid')
 local map   = require (path..'map')
 

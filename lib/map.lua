@@ -69,18 +69,20 @@ function map.new(image,atlas, tw,th)
 	self.SBwidth = qcols*tw
 	self.SBheight= qrows*th	
 	
-	self.tilegrid= grid.new()
-	self.image   = image
-	self.gx      = nil
-	self.gy      = nil
-	self.gx2     = nil
-	self.gy2     = nil
-	self.quads   = {}
-	self.atlas   = atlas
-	self.hw      = qw/2
-	self.hh      = qh/2
-	self.tw      = tw
-	self.th      = th
+	self.tilegrid = grid.new()
+	self.image    = image
+	self.imagepath= nil
+	self.atlaspath= nil
+	self.gx       = nil
+	self.gy       = nil
+	self.gx2      = nil
+	self.gy2      = nil
+	self.quads    = {}
+	self.atlas    = atlas
+	self.hw       = qw/2
+	self.hh       = qh/2
+	self.tw       = tw
+	self.th       = th
 	
 	return setmetatable(self,map)
 end
@@ -121,8 +123,24 @@ function map:getAtlas()
 	return self.atlas
 end
 
+function map:setAtlasPath(atlaspath)
+	self.atlaspath = atlaspath
+end
+
+function map:getAtlasPath()
+	return self.atlaspath
+end
+
 function map:getTileSize()
 	return self.tw,self.th
+end
+
+function map:setImagePath(imagepath)
+	self.imagepath = imagepath
+end
+
+function map:getImagePath()
+	return self.imagepath
 end
 
 function map:setImage(image)

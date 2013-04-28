@@ -53,7 +53,7 @@ local preallocateSB = function(self,gx,gy)
 				sx      = 1,
 				sy      = 1,
 			}
-			grid.set(self.tiledata,tox+x,toy+y,tiledata)
+			grid.set(self.tilegrid,tox+x,toy+y,tiledata)
 		end
 	end
 	sb:unbind()
@@ -84,7 +84,7 @@ function isomap.new(image,atlas, tw,th)
 	self.SBwidth = qcols
 	self.SBheight= qrows
 	
-	self.tiledata= grid.new()
+	self.tilegrid= grid.new()
 	self.image   = image
 	self.gx      = nil
 	self.gy      = nil
@@ -103,12 +103,12 @@ function isomap.new(image,atlas, tw,th)
 end
 
 function isomap:setAtlasIndex(tx,ty,index)
-	local t = grid.get(self.tiledata,tx,ty)
+	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
 		local gx,gy = getSBrange(tx-1,ty-1,1,1,self.SBwidth,self.SBheight)
 		preallocateSB(self,gx,gy)
-		t = grid.get(self.tiledata,tx,ty)
+		t = grid.get(self.tilegrid,tx,ty)
 	end
 	
 	if not index then

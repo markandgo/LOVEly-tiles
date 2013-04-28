@@ -1,16 +1,20 @@
-local __setings = {__index = function(t,k) rawset(t,k,{}) return t[k] end,__mode= 'k'}
+local __settings = {__index = function(t,k) rawset(t,k,{}) return t[k] end,__mode= 'k'}
 
-local t   = {}
+local t   = {__call = function(self,i) return self.layers[i] end}
 t.__index = t
 
 function t.new()
 	local drawstack = {
 		layers   = {},
-		settings = setmetatable({},__setings),
+		settings = setmetatable({},__settings),
 		x        = 0,
 		y        = 0,
 	}
 	return setmetatable(drawstack,t)
+end
+
+function t:getLayer(i)
+	return self.layers[i]
 end
 
 function t:add(layer,i,xtransfactor,ytransfactor,isDrawable)

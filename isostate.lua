@@ -9,7 +9,7 @@ function s:load()
 	sheet = gr.newImage('isotile.png')
 	sheet:setFilter('linear','nearest')
 	
-	sheetatlas = atlas.new(640,1024, 64,64, 640,1024, 0,64*3, 64,0)
+	sheetatlas = atlas.new(640,1024, 64,64)
 		
 	local mapsource =[[
 xxxxx  xxxx   xxxx   xxxxx
@@ -22,7 +22,7 @@ xxxxx  xxxx   xxxx   xxxxx
 	map = isomap.new(sheet,sheetatlas,64,32)	
 	
 	for x,y,v in md.string(mapsource) do
-		if v == 'x' then map:setAtlasIndex(x,y,3) end
+		if v == 'x' then map:setAtlasIndex(x,y,{5,4}) end
 	end
 	
 	map:setFlip(1,1,true,false)

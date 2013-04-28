@@ -37,7 +37,7 @@ local preallocateSB = function(self,gx,gy)
 				sx      = 1,
 				sy      = 1,
 			}
-			grid.set(self.tiledata,tox+x,toy+y,tiledata)
+			grid.set(self.tilegrid,tox+x,toy+y,tiledata)
 		end
 	end
 	sb:unbind()
@@ -55,10 +55,7 @@ end
 
 local map   = {}
 map.__index = map
-
-map.__call = function(self,tx,ty)
-	return self.tiledata.grid[tx][ty].property
-end
+map.__call  = function(self,tx,ty) return map.getAtlasIndex(self,tx,ty) end
 
 function map.new(image,atlas, tw,th)
 	local self   = grid.new()
@@ -72,7 +69,7 @@ function map.new(image,atlas, tw,th)
 	self.SBwidth = qcols*tw
 	self.SBheight= qrows*th	
 	
-	self.tiledata= grid.new()
+	self.tilegrid= grid.new()
 	self.image   = image
 	self.gx      = nil
 	self.gy      = nil
@@ -89,14 +86,14 @@ function map.new(image,atlas, tw,th)
 end
 
 function map:setAtlasIndex(tx,ty,index)
-	local t = grid.get(self.tiledata,tx,ty)
+	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
 		local rx,ry= self.tw*(tx-1),self.th*(ty-1)
 		local gx,gy= getSBrange(rx,ry,self.tw,self.th,self.SBwidth,self.SBheight)
 		preallocateSB(self,gx,gy)
 		
-		t = grid.get(self.tiledata,tx,ty)
+		t = grid.get(self.tilegrid,tx,ty)
 	end
 	
 	if not index then
@@ -116,8 +113,16 @@ function map:setAtlasIndex(tx,ty,index)
 end
 
 function map:getAtlasIndex(tx,ty)
-	local t = grid.get(self.tiledata,tx,ty)
+	local t = grid.get(self.tilegrid,tx,ty)
 	return t and t.index
+end
+
+function map:getAtlas()
+	return self.atlas
+end
+
+function map:getTileSize()
+	return self.tw,self.th
 end
 
 function map:setImage(image)
@@ -132,15 +137,15 @@ function map:getImage()
 end
 
 function map:setProperty(tx,ty,value)
-	grid.get(self.tiledata,tx,ty).property = value
+	grid.get(self.tilegrid,tx,ty).property = value
 end
 
 function map:getProperty(tx,ty)
-	return grid.get(self.tiledata,tx,ty).property
+	return grid.get(self.tilegrid,tx,ty).property
 end
 
 function map:setFlip(tx,ty,flipx,flipy)
-	local t       = grid.get(self.tiledata,tx,ty)
+	local t       = grid.get(self.tilegrid,tx,ty)
 	local sx,sy   = flipx and -1 or 1,flipy and -1 or 1
 	t.sb:setq( t.id,t.quad, t.x+self.hw,t.y+self.hh, t.angle, sx,sy, self.hw,self.hh)
 	t.sx = sx
@@ -148,18 +153,18 @@ function map:setFlip(tx,ty,flipx,flipy)
 end
 
 function map:getFlip(tx,ty)
-	local tiledata = grid.get(self.tiledata,tx,ty)
+	local tiledata = grid.get(self.tilegrid,tx,ty)
 	return tiledata.sx == -1,tiledata.sy == -1
 end
 
 function map:setAngle(tx,ty,angle)
-	local t       = grid.get(self.tiledata,tx,ty)
+	local t       = grid.get(self.tilegrid,tx,ty)
 	t.sb:setq( t.id,t.quad, t.x+self.hw,t.y+self.hh, angle, t.sx,t.sy, self.hw,self.hh)
 	t.angle = angle
 end
 
 function map:getAngle(tx,ty)
-	return grid.get(self.tiledata,tx,ty).angle
+	return grid.get(self.tilegrid,tx,ty).angle
 end
 
 function map:setViewport(x,y,w,h)

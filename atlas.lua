@@ -15,19 +15,25 @@ local indexToCoord = function(atlas,index)
 end
 
 local getq = function(self,index)
-	return grid.get(self,indexToCoord(self,index))
+	return grid.get(self,indexToCoord(self,index)).quad
 end
 
 -------------------
 -- MODULE
 -------------------
 
-local atlas  = {}
+local atlas  = setmetatable({},{__call = function(self,...) return self.new(...) end})
 atlas.__index= atlas
+
+atlas.__call = function(self,index)
+	return atlas.getqViewport(self,index)
+end
 
 function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,atlasHeight,  ox,oy,  xspacing,yspacing)
 	local iw,ih,qw,qh,aw,ah,xs,ys = imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight,xspacing,yspacing
+	
 	local self  = grid.new()
+	qh          = qh or qw
 	ox,oy       = ox or 0,oy or 0
 	xs,ys       = xs or 0,ys or 0
 	aw          = aw or iw
@@ -35,17 +41,24 @@ function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,at
 	local tw,th = qw+xs,qh+ys
 	local dx,dy = (aw+xs)/tw,(ah+ys)/th
 	assert(dx % 1 == 0 and dy % 1 == 0,'Dimensions of atlas must be multiples of dimensions of quads + spacings!')
-	self.properties= grid.new()
 	self.rows      = dy
 	self.columns   = dx
 	self.qWidth    = qw
 	self.qHeight   = qh
+	self.aWidth    = aw
+	self.aHeight   = ah
+	self.ox,self.oy= ox,oy
+	self.xs,self.ys= xs,ys
 	self.iWidth    = imageWidth
 	self.iHeight   = imageHeight
 	
 	for gx = 1,dx do 
 		for gy = 1,dy do
-			grid.set(self,gx,gy,quad((gx-1)*tw+ox,(gy-1)*th+oy,qw,qh,iw,ih))
+			local tile = {
+				quad     = quad((gx-1)*tw+ox,(gy-1)*th+oy,qw,qh,iw,ih),
+				property = nil,
+			}
+			grid.set(self,gx,gy,tile)
 		end
 	end
 	return setmetatable(self,atlas)
@@ -63,6 +76,14 @@ function atlas:getImageSize()
 	return self.iWidth,self.iHeight
 end
 
+function atlas:getViewport()
+	return self.ox,self.oy,self.aWidth,self.aHeight
+end
+
+function atlas:getSpacings()
+	return self.xs,self.ys
+end
+
 function atlas:getqSize()
 	return self.qWidth,self.qHeight
 end
@@ -72,12 +93,11 @@ function atlas:getqViewport(index)
 end
 
 function atlas:setProperty(index,value)
-	local gx,gy = indexToCoord(self,index)
-	grid.set(self.properties,gx,gy,value)
+	grid.get(self,indexToCoord(self,index)).property = value
 end
 
 function atlas:getProperty(index)
-	return grid.get(self.properties,indexToCoord(self,index))
+	return grid.get(self,indexToCoord(self,index)).property
 end
 
 function atlas:draw(image,index,...)

@@ -1,21 +1,36 @@
-local __setings = {__index = function(t,k) rawset(t,k,{}) return t[k] end,__mode= 'k'}
+local __settings = {__index = function(t,k) rawset(t,k,{}) return t[k] end,__mode= 'k'}
 
-local t   = {}
+local t   = setmetatable({},{__call = function(self,...) return self.new(...) end})
+t.__call  = function(self,i) return self.layers[i] end
 t.__index = t
 
 function t.new()
-	local drawstack = {
+	local d = {
 		layers   = {},
-		settings = setmetatable({},__setings),
+		settings = setmetatable({},__settings),
 		x        = 0,
 		y        = 0,
 	}
-	return setmetatable(drawstack,t)
+	return setmetatable(d,t)
 end
 
-function t:add(layer,i,xtransfactor,ytransfactor,isDrawable)
+function t:setLayerPath(i,path)
+	local layer = self.layers[i]
+	self.settings[layer].path = path
+end
+
+function t:getLayerPath(i)
+	local layer = self.layers[i]
+	return self.settings[layer].path
+end
+
+function t:getLayer(i)
+	return self.layers[i]
+end
+
+function t:insert(layer,i,xtransfactor,ytransfactor,isDrawable)
 	i           = i or #self.layers+1
-	xtransfactor= xtransfactor or 0
+	xtransfactor= xtransfactor or 1
 	ytransfactor= ytransfactor or xtransfactor
 	table.insert(self.layers,i,layer)
 	local t        = self.settings[layer]
@@ -57,7 +72,7 @@ function t:sort(func)
 	table.sort(self.layers,func)
 end
 
-function t:totalLayers()
+function t:length()
 	return #self.layers
 end
 

@@ -24,6 +24,10 @@ local isoToScreen = function(ix,iy,tw,th)
 	return x,y
 end
 
+local setQuad = function(self,t)
+	t.sb:setq( t.id,t.quad, t.x+self.hw,t.y+self.hh, t.angle, t.sx,t.sy, self.hw,self.hh)	
+end
+
 local preallocateSB = function(self,gx,gy)	
 	self.sbrows= max(self.sbcols,gx)
 	self.sbcols= max(self.sbrows,gy)
@@ -53,7 +57,7 @@ local preallocateSB = function(self,gx,gy)
 				sx      = 1,
 				sy      = 1,
 			}
-			grid.set(self.tiledata,tox+x,toy+y,tiledata)
+			grid.set(self.tilegrid,tox+x,toy+y,tiledata)
 		end
 	end
 	sb:unbind()
@@ -69,14 +73,14 @@ local getQuad = function(self,index)
 	return quad
 end
 
-local isomap   = setmetatable({},map)
+local isomap   = setmetatable({},{__call = function(self,...) return self.new(...) end,__index = map})
 isomap.__index = isomap
 
 function isomap.new(image,atlas, tw,th)
 	local self   = grid.new()
 	
 	local qw,qh  = atlas:getqSize()
-	tw,th        = tw or qw,th or qh
+	tw,th        = tw or qw,th or tw or qh
 	
 	local qrows  = floor(sqrt(PREALLOCATE_SB_SIZE))
 	local qcols  = qrows
@@ -84,36 +88,42 @@ function isomap.new(image,atlas, tw,th)
 	self.SBwidth = qcols
 	self.SBheight= qrows
 	
-	self.tiledata= grid.new()
-	self.image   = image
-	self.gx      = nil
-	self.gy      = nil
-	self.gx2     = nil
-	self.gy2     = nil
-	self.sbrows  = 0
-	self.sbcols  = 0
-	self.quads   = {}
-	self.atlas   = atlas
-	self.hw      = qw/2
-	self.hh      = qh/2
-	self.tw      = tw
-	self.th      = th
+	self.tilegrid = grid.new()
+	self.image    = image
+	self.imagepath= nil
+	self.atlaspath= nil
+	self.gx       = nil
+	self.gy       = nil
+	self.gx2      = nil
+	self.gy2      = nil
+	self.sbrows   = 0
+	self.sbcols   = 0
+	self.quads    = {}
+	self.atlas    = atlas
+	self.hw       = qw/2
+	self.hh       = qh/2
+	self.tw       = tw
+	self.th       = th
 	
 	return setmetatable(self,isomap)
 end
 
-function isomap:setAtlasIndex(tx,ty,index)
-	local t = grid.get(self.tiledata,tx,ty)
+function isomap:setAtlasIndex(tx,ty,index, angle,flipx,flipy)
+	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
 		local gx,gy = getSBrange(tx-1,ty-1,1,1,self.SBwidth,self.SBheight)
 		preallocateSB(self,gx,gy)
-		t = grid.get(self.tiledata,tx,ty)
+		t = grid.get(self.tilegrid,tx,ty)
 	end
 	
 	if not index then
 		t.quad    = nil
 		t.index   = nil
+		t.angle   = nil
+		t.sx      = nil
+		t.sy      = nil
+		t.property= nil
 		t.sb:setq( t.id, dummyquad, 0,0,0,0)
 		return
 	end
@@ -121,10 +131,11 @@ function isomap:setAtlasIndex(tx,ty,index)
 	local quad= getQuad(self,index)
 	t.quad    = quad
 	t.index   = type(index)== 'table' and ( self.atlas:getColumns()*(index[2]-1)  +  index[1] ) or index
-	t.angle   = 0
-	t.sx      = 1
-	t.sy      = 1
-	t.sb:setq( t.id, quad, t.x,t.y)
+	t.angle   = angle or 0
+	t.sx      = flipx and -1 or 1
+	t.sy      = flipy and -1 or 1
+	
+	setQuad(self,t)
 end
 
 function isomap:draw(x,y,r, sx,sy, ox,oy, kx,ky)

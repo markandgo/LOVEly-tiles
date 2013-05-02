@@ -15,7 +15,8 @@ local indexToCoord = function(atlas,index)
 end
 
 local getq = function(self,index)
-	return grid.get(self,indexToCoord(self,index)).quad
+	local cell = grid.get(self,indexToCoord(self,index))
+	return cell and cell.quad or error ('Atlas index is out of range')
 end
 
 -------------------

@@ -72,7 +72,7 @@ function t:sort(func)
 	table.sort(self.layers,func)
 end
 
-function t:length()
+function t:totalLayers()
 	return #self.layers
 end
 

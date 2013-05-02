@@ -114,7 +114,13 @@ function l.saveMap(map,path)
 			if no_angle_meta and no_flip_meta and not v.property then
 				grid.set(t.tilegrid,x,y,index)
 			else
-				local p   = {}
+				local p   = {
+					index   = nil,
+					sx      = nil,
+					sy      = nil,
+					angle   = nil,
+					property= nil,
+				}
 				p.index   = index
 				if not no_flip_meta then
 					p.sx,p.sy = v.sx,v.sy

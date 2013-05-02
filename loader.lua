@@ -28,6 +28,21 @@ local stripExcessSlash = function(path)
 	return path:gsub('[\\/]+','/'):match('^/?(.*)')
 end
 
+local copyProperty = function(p)
+	local ptype = type(p)
+	if ptype ~= 'table' then return p end
+	
+	local copy = {}
+	for i,v in pairs(t) do
+		local itype = type(i)
+		local vtype = type(v)
+		if itype ~= 'table' and vtype ~= 'table' then
+			copy[i] = v
+		end
+	end
+	return copy
+end
+
 -- ====================================
 -- MODULE
 -- ====================================
@@ -50,7 +65,7 @@ function l.saveAtlas(atlas,path)
 	}
 	for x,y,v in grid.iterate(atlas) do
 		if v.property then
-			t.properties:set(x,y,v.property)
+			t.properties:set(x,y,copyProperty(t.property))
 		end
 	end
 	
@@ -107,7 +122,7 @@ function l.saveMap(map,path)
 				if not no_angle_meta then
 					p.angle = v.angle
 				end
-				p.property = v.property
+				p.property = copyProperty(v.property)
 				grid.set(t.tilegrid,x,y,p)
 			end
 		end

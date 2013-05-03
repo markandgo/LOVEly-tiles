@@ -4,7 +4,6 @@ local atlas    = require(path..'atlas')
 local map      = require(path..'map')
 local isomap   = require(path..'isomap')
 local drawlist = require(path..'drawlist')
-local bitop    = require(path..'ext.numberlua')
 local xmlparser= require(path..'ext.xml')
 local unb64    = require ('mime').unb64
 local deflate  = require(path..'ext.deflate')

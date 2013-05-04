@@ -1,14 +1,14 @@
-local path     = (...):match('^.+[%.\\/]') or ''
-local grid     = require(path..'grid')
-local atlas    = require(path..'atlas')
-local map      = require(path..'map')
-local isomap   = require(path..'isomap')
-local drawlist = require(path..'drawlist')
-local xmlparser= require(path..'ext.xml')
-local unb64    = require ('mime').unb64
-local deflate  = require(path..'ext.deflate')
-
-local imageCache    = setmetatable({},{__mode == 'v'})
+local path      = (...):match('^.+[%.\\/]') or ''
+local grid      = require(path..'grid')
+local atlas     = require(path..'atlas')
+local mapdata   = require(path..'mapdata')
+local map       = require(path..'map')
+local isomap    = require(path..'isomap')
+local drawlist  = require(path..'drawlist')
+local xmlparser = require(path..'ext.xml')
+local unb64     = require ('mime').unb64
+local deflate   = require(path..'ext.deflate')
+local imageCache= setmetatable({},{__mode== 'v'})
 
 -- ==============================================
 -- XML HANDLER LOGIC
@@ -76,22 +76,23 @@ i.object = function(object,objectgroup)
 	table.insert(objectgroup.objects,object)
 end
 
-i.polygon = function(object,parent)
-	local points = {}
-	for point in object.points:gmatch '(%d+)' do
+local function convertPoints(object)
+	local newpoints = {}
+	for point in object.points:gmatch '(-?%d+)' do
 		point = tonumber(point)
-		table.insert(points,point)
+		table.insert(newpoints,point)
 	end
-	parent.polygon = points
+	object.points = newpoints
+end
+
+i.polygon = function(object,parent)
+	convertPoints(object)
+	parent.polygon = object
 end
 
 i.polyline = function(object,parent)
-	local points = {}
-	for point in object.points:gmatch '(%d+)' do
-		point = tonumber(point)
-		table.insert(points,point)
-	end
-	parent.polyline = points
+	convertPoints(object)
+	parent.polyline = object
 end
 
 -- ==============================================
@@ -162,7 +163,7 @@ local stripExcessSlash = function(path)
 end
 
 -- ==============================================
--- HELPER FUNCTIONS
+-- HELPER LOAD FUNCTIONS
 -- ==============================================
 
 local function byteToNumber(str)
@@ -290,11 +291,12 @@ local function buildAtlasesAndImages(tmxmap)
 				end
 				atlas:setProperty(tile.id+1,properties)
 			end
-		end
+		end		
 	end
 end
 
 local function storeAtlasesByName(tmxmap,dl)
+	dl.atlases = {}
 	for i,tileset in pairs(tmxmap.tilesets) do
 		dl.atlases[tileset.name] = tileset.atlas
 	end
@@ -313,11 +315,12 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
 	map.imagepath = tileset.imagepath
 	map.properties= layer.properties
-	map.atlaspath = tileset.name..'.atlas'
+	map:setAtlasPath(tileset.name..'.atlas')
 	return tileset,map
 end
 
 local function storeLayersByName(tmxmap,dl)
+	dl.layernames = {}
 	for i,layer in pairs(tmxmap.layers) do
 		dl.layernames[layer.name] = layer
 	end
@@ -340,15 +343,11 @@ end
 -- TMX LOADER
 -- ==============================================
 
-local function loader(filename)
+return function(filename)
 	local tmxmap = tmxToTable(filename)
 	
 	local dl = drawlist.new()
 	dl.properties = tmxmap.properties
-	
-	-- access by names
-	dl.layernames = {}
-	dl.atlases    = {}
 	
 	buildAtlasesAndImages(tmxmap)
 	storeAtlasesByName(tmxmap,dl)
@@ -367,10 +366,8 @@ local function loader(filename)
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
 				end
 			end
-			if map then 
-				dl:insert(map,nil,1,1,layer.visible ~= 0) 
-				dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
-			end
+			dl:insert(map,nil,1,1,layer.visible ~= 0) 
+			dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
 		else
 			function layer:draw() end
 			if layer.image then buildImage(tmxmap,layer) end
@@ -381,5 +378,3 @@ local function loader(filename)
 	
 	return dl
 end
-
-return loader

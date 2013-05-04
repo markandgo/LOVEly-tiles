@@ -174,7 +174,7 @@ local function removeUpDirectory(path)
 end
 
 local stripExcessSlash = function(path)
-	return path:gsub('[\\/]+','/'):match('^/?(.*)')
+	return path:gsub('[\\/]+','/')
 end
 
 -- ==============================================

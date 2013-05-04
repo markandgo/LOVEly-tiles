@@ -10,6 +10,21 @@ local unb64     = require ('mime').unb64
 local deflate   = require(path..'ext.deflate')
 local imageCache= setmetatable({},{__mode== 'v'})
 
+-- offset hack
+local draw = map.draw
+function map:draw(x,y,...)
+	local offsets = self.atlas.tileoffset
+	if offsets then draw(self,  x+offsets.x,y+offsets.y, ...)
+	else draw(self,x,y,...) end
+end
+
+local draw = isomap.draw
+function isomap:draw(x,y,...)
+	local offsets = self.atlas.tileoffset
+	if offsets then draw(self,  x+offsets.x,y+offsets.y, ...)
+	else draw(self,x,y,...) end
+end
+
 -- ==============================================
 -- XML HANDLER LOGIC
 -- ==============================================
@@ -280,7 +295,9 @@ local function buildAtlasesAndImages(tmxmap)
 		local atlasH    = math.floor( (ih-offset*2+space)/(th+space) ) * (th+space) - space
 		local atlas     = atlas.new(iw,ih,tw,th,atlasW,atlasH,offset,offset,space,space)
 		atlas.properties= tileset.properties
-		tileset.atlas   = atlas		
+		-- hack for tileoffset
+		atlas.tileoffset= tileset.tileoffset
+		tileset.atlas   = atlas
 		
 		
 		for i,tile in pairs(tileset.tiles) do
@@ -315,6 +332,7 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
 	map.imagepath = tileset.imagepath
 	map.properties= layer.properties
+	
 	map:setAtlasPath(tileset.name..'.atlas')
 	return tileset,map
 end

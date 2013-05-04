@@ -10,19 +10,39 @@ local unb64     = require ('mime').unb64
 local deflate   = require(path..'ext.deflate')
 local imageCache= setmetatable({},{__mode== 'v'})
 
--- offset hack
+-- hack for offset/opacity
 local draw = map.draw
 function map:draw(x,y,...)
+	local opacity = self.opacity
+	local lg      = love.graphics
+	local r,g,b,a
+	if opacity then
+		r,g,b,a = lg.getColor()
+		lg.setColor(r,g,b,a*opacity)
+	end
+	
 	local offsets = self.atlas.tileoffset
 	if offsets then draw(self,  x+offsets.x,y+offsets.y, ...)
 	else draw(self,x,y,...) end
+	
+	if opacity then lg.setColor(r,g,b,a) end
 end
 
 local draw = isomap.draw
 function isomap:draw(x,y,...)
+	local opacity = self.opacity
+	local lg      = love.graphics
+	local r,g,b,a
+	if opacity then
+		r,g,b,a = lg.getColor()
+		lg.setColor(r,g,b,a*opacity)
+	end
+	
 	local offsets = self.atlas.tileoffset
 	if offsets then draw(self,  x+offsets.x,y+offsets.y, ...)
 	else draw(self,x,y,...) end
+	
+	if opacity then lg.setColor(r,g,b,a) end
 end
 
 -- ==============================================
@@ -332,6 +352,7 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
 	map.imagepath = tileset.imagepath
 	map.properties= layer.properties
+	map.opacity   = layer.opacity
 	
 	map:setAtlasPath(tileset.name..'.atlas')
 	return tileset,map

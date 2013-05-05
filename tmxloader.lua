@@ -11,9 +11,7 @@ local deflate   = require(path..'ext.deflate')
 local imageCache= setmetatable({},{__mode== 'v'})
 
 -- hack for offset/opacity/align to bottom left
-local mapdraw = map.draw
-local isodraw = isomap.draw
-local function proxydraw(self,draw,x,y,...)
+local function proxyDraw(self,draw,x,y,...)
 	local opacity = self.opacity
 	local lg      = love.graphics
 	local r,g,b,a
@@ -31,11 +29,11 @@ local function proxydraw(self,draw,x,y,...)
 	if opacity then lg.setColor(r,g,b,a) end
 end
 
-function map:draw(...)
-	proxydraw(self,mapdraw,...)
-end
-function isomap:draw(...)
-	proxydraw(self,isodraw,...)
+local function applyTmxStyleToDraw(map)
+	local olddraw = map.draw	
+	function map:draw(...)
+		proxyDraw(self,olddraw,...)
+	end
 end
 
 -- ==============================================
@@ -343,6 +341,7 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	end
 	local tileset = chosen
 	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
+	applyTmxStyleToDraw(map)
 	map.imagepath = tileset.imagepath
 	map.properties= layer.properties
 	map.opacity   = layer.opacity

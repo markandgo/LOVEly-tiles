@@ -76,7 +76,7 @@ function l.loadAtlas(path)
 	path = stripExcessSlash(path)
 	
 	local t         = serialize.load(path)
-	if not t then return _,'No file was found for the specified path' end
+	if not t then return nil,'No file was found for the specified path' end
 	
 	local atlas     = atlas.new(t.iWidth,t.iHeight,t.qWidth,t.qHeight,t.aWidth,t.aHeight,t.ox,t.oy,t.xs,t.ys)
 	local coords    = {}
@@ -146,7 +146,7 @@ function l.loadMap(path)
 	local dir,name,ext= getPathComponents(path)
 	local t           = serialize.load(path)
 	
-	if not t then return _,'No file was found for the specified path' end
+	if not t then return nil,'No file was found for the specified path' end
 	
 	local atlaspath   = removeUpDirectory( dir..t.atlaspath )
 	local imagepath   = removeUpDirectory( dir..t.imagepath )
@@ -210,7 +210,7 @@ function l.loadDrawList(path)
 	local dir,name,ext= getPathComponents(path)
 	
 	local t           = serialize.load(path)
-	if not t then return _,'No file was found for the specified path' end
+	if not t then return nil,'No file was found for the specified path' end
 	
 	local dl = drawlist.new()
 	dl:setTranslation(t.x,t.y)

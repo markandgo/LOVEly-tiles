@@ -193,7 +193,6 @@ end
 -- ==============================================
 -- HELPER LOAD FUNCTIONS
 -- ==============================================
-
 local function byteToNumber(str)
 	local num = 0
 	local len = #str
@@ -362,6 +361,8 @@ end
 local tmxToTable = function(filename)
 	local h        = newHandler()
 	local tmxparser= xmlparser(h)
+	local hasFile  = love.filesystem.isFile(filename)
+	if not hasFile then return nil,'TMX map not found: '..filename end
 	local str      = love.filesystem.read(filename)
 	tmxparser:parse(str)
 	local tmxmap   = h.root.map
@@ -377,7 +378,8 @@ end
 -- ==============================================
 
 return function(filename)
-	local tmxmap = tmxToTable(filename)
+	local tmxmap,err = tmxToTable(filename)
+	if err then return nil,err end
 	
 	local dl = drawlist.new()
 	dl.properties = tmxmap.properties

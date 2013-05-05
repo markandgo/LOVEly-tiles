@@ -255,11 +255,11 @@ local streamData = function(tmxmap,data)
 			local antidiagflip= flips % 2
 
 --[[
-flipx flipy diagflip --> flipx flipy angle
-1     0     1            0     0      90
-1     1     1            0     1      90
-0     1     1            1     1      90
-0     0     1            1     0      90
+flipx flipy diagflip --> flipx flipy angle -- or --> flipx flipy angle
+1     0     1            0     0      90             1     1     -90     
+1     1     1            0     1      90             1     0     -90
+0     1     1            1     1      90             0     0     -90
+0     0     1            1     0      90             0     1     -90
 --]]
 			
 			local angle = 0

@@ -203,7 +203,8 @@ local function byteToNumber(str)
 	return num
 end
 
-local streamData = function(tmxmap,data)
+local streamData = function(tmxmap,layer)
+	local data  = layer.data
 	local str   = data.encoding == 'base64' and unb64(data[1]) or data[1]
 	local bytes = {len = 0}
 	
@@ -225,7 +226,7 @@ local streamData = function(tmxmap,data)
 		local divbits = 2^29
 		local pattern = data.encoding == 'base64' and '(....)' or '(%d+)'
 		local count   = 0
-		local w,h     = tmxmap.width,tmxmap.height
+		local w,h     = layer.width or tmxmap.width,layer.height or tmxmap.height
 		
 		
 		for num in str:gmatch(pattern) do
@@ -388,7 +389,7 @@ return function(filename)
 		local isTileLayer = layer.data
 		if isTileLayer then
 			local tileset,map,firstgid
-			for gid,x,y,angle,flipx,flipy in streamData(tmxmap,layer.data) do
+			for gid,x,y,angle,flipx,flipy in streamData(tmxmap,layer) do
 				if gid ~= 0 then
 					if not (tileset and map) then
 						tileset,map = getTilesetAndMap(gid,tmxmap,layer)

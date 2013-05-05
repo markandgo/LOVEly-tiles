@@ -107,10 +107,10 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 			margin    = (iw-aw)/2,
 			
 			prepareTableProperties(atlas.properties),
-			image,
-			tileoffset,
 			-- tile
 		}
+		table.insert(tileset,tileoffset)
+		table.insert(tileset,image)
 		
 		for i,tile in ipairs(tiles) do
 			table.insert(tileset,tile)
@@ -201,8 +201,8 @@ local makeAndInsertTileLayer = function(drawlist,i,layer,layers,firstgid)
 		opacity  = layer.opacity,
 		
 		prepareTableProperties(layer.properties),
-		formatteddata,
 	}
+	table.insert(formattedlayer,formatteddata)
 	table.insert(layers,formattedlayer)
 end
 

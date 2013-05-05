@@ -58,7 +58,6 @@ end
 local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 	local atlas = layer:getAtlas()
 	if not atlasDone[atlas] then
-		atlasDone[atlas]= atlas
 		local tw,th     = atlas:getqSize()
 		local _,_,aw    = atlas:getViewport()
 		
@@ -117,7 +116,8 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 		end
 		
 		table.insert(tilesets,tileset)
-		local newgid = 1+(rows*cols)
+		atlasDone[atlas]= firstgid
+		local newgid    = firstgid+(rows*cols)
 		return newgid
 	end
 end
@@ -171,9 +171,9 @@ local getFlipBits = function(x,y,layer)
 	return xbit+ybit+diagbit
 end
 
-local makeAndInsertTileLayer = function(drawlist,i,layer,layers,firstgid)
-	
-	local data = layer:export()
+local makeAndInsertTileLayer = function(drawlist,i,layer,layers,atlasDone)
+	local firstgid= atlasDone[ layer:getAtlas() ]
+	local data    = layer:export()
 	
 	for x,y,index in mapdata.array(data,data.width,data.height) do
 		if index ~= 0 then
@@ -304,7 +304,7 @@ local function prepareTable(drawlist,path)
 		local class = meta and meta.__index
 		if class == map or class == isomap then
 			local newgid = makeAndInsertTileset(layer,atlasDone,tilesets,firstgid)
-			makeAndInsertTileLayer(drawlist,i,layer,layers,firstgid)
+			makeAndInsertTileLayer(drawlist,i,layer,layers,atlasDone)
 			firstgid = newgid or firstgid
 		elseif layer.objects then
 			makeAndInsertObjGroup(layer,layers)

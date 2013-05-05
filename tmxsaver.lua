@@ -171,7 +171,7 @@ local getFlipBits = function(x,y,layer)
 	return xbit+ybit+diagbit
 end
 
-local makeAndInsertTileLayer = function(drawlist,layer,layers,firstgid)
+local makeAndInsertTileLayer = function(drawlist,i,layer,layers,firstgid)
 	
 	local data = layer:export()
 	
@@ -304,7 +304,7 @@ local function prepareTable(drawlist,path)
 		local class = meta and meta.__index
 		if class == map or class == isomap then
 			local newgid = makeAndInsertTileset(layer,atlasDone,tilesets,firstgid)
-			makeAndInsertTileLayer(drawlist,layer,layers,firstgid)
+			makeAndInsertTileLayer(drawlist,i,layer,layers,firstgid)
 			firstgid = newgid or firstgid
 		elseif layer.objects then
 			makeAndInsertObjGroup(layer,layers)

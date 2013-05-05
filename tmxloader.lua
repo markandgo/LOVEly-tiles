@@ -10,9 +10,10 @@ local unb64     = require ('mime').unb64
 local deflate   = require(path..'ext.deflate')
 local imageCache= setmetatable({},{__mode== 'v'})
 
--- hack for offset/opacity
-local draw = map.draw
-function map:draw(x,y,...)
+-- hack for offset/opacity/align to bottom left
+local mapdraw = map.draw
+local isodraw = isomap.draw
+local function proxydraw(self,draw,x,y,...)
 	local opacity = self.opacity
 	local lg      = love.graphics
 	local r,g,b,a
@@ -20,6 +21,8 @@ function map:draw(x,y,...)
 		r,g,b,a = lg.getColor()
 		lg.setColor(r,g,b,a*opacity)
 	end
+	-- align bottom left
+	y = y+(self.th-self.atlas.qHeight)
 	
 	local offsets = self.atlas.tileoffset
 	if offsets then draw(self,  x+offsets.x,y+offsets.y, ...)
@@ -28,21 +31,11 @@ function map:draw(x,y,...)
 	if opacity then lg.setColor(r,g,b,a) end
 end
 
-local draw = isomap.draw
-function isomap:draw(x,y,...)
-	local opacity = self.opacity
-	local lg      = love.graphics
-	local r,g,b,a
-	if opacity then
-		r,g,b,a = lg.getColor()
-		lg.setColor(r,g,b,a*opacity)
-	end
-	
-	local offsets = self.atlas.tileoffset
-	if offsets then draw(self,  x+offsets.x,y+offsets.y, ...)
-	else draw(self,x,y,...) end
-	
-	if opacity then lg.setColor(r,g,b,a) end
+function map:draw(...)
+	proxydraw(self,mapdraw,...)
+end
+function isomap:draw(...)
+	proxydraw(self,isodraw,...)
 end
 
 -- ==============================================

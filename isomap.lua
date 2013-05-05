@@ -42,8 +42,6 @@ local preallocateSB = function(self,gx,gy)
 		for x = 1,self.SBwidth do
 		
 			local rx,ry = isoToScreen(x+tox,y+toy,self.tw,self.th)
-			-- align to bottom left corner
-			rx,ry       = rx-(qw-self.tw),ry-(qh-self.th)
 			
 			local tiledata= {
 				quad    = nil,

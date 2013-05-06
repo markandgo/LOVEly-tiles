@@ -81,7 +81,7 @@ function map.new(image,atlas, tw,th)
 	self.gy       = nil
 	self.gx2      = nil
 	self.gy2      = nil
-	self.quads    = {}
+	self.quads    = setmetatable({},{__mode = 'kv'})
 	self.atlas    = atlas
 	self.hw       = qw/2
 	self.hh       = qh/2

@@ -96,7 +96,7 @@ function isomap.new(image,atlas, tw,th)
 	self.gy2      = nil
 	self.sbrows   = 0
 	self.sbcols   = 0
-	self.quads    = {}
+	self.quads    = setmetatable({},{__mode = 'kv'})
 	self.atlas    = atlas
 	self.hw       = qw/2
 	self.hh       = qh/2

@@ -58,6 +58,10 @@ function map:getOpacity()
 	return self.opacity
 end
 
+function map:setOpacity(opacity)
+	self.opacity = opacity
+end
+
 function map:getLayerProperty(name)
 	return self.properties[name]
 end

@@ -123,20 +123,11 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 end
 
 local isEqualAngle = function(angle1,angle2)
-	local fullcircle = 2*math.pi
-	while angle1 >= fullcircle do
-		angle1 = angle1-fullcircle
-	end
-	while angle1 < 0 do
-		angle1 = angle1+fullcircle
-	end
+	local cos1,sin1 = math.cos(angle1),math.sin(angle1)
+	angle1          = math.atan2(sin1,cos1)
 	
-	while angle2 >= fullcircle do
-		angle2 = angle2-fullcircle
-	end
-	while angle2 < 0 do
-		angle2 = angle2+fullcircle
-	end
+	local cos2,sin2 = math.cos(angle2),math.sin(angle2)
+	angle2          = math.atan2(sin2,cos2)
 	
 	return math.abs(angle1-angle2) < 0.02
 end
@@ -147,6 +138,7 @@ local getFlipBits = function(x,y,layer)
 	
 	local flipx,flipy      = layer:getFlip(x,y)
 	local xbit,ybit,diagbit= 0,0,0
+	if flipx and flipy then flipx,flipy = false; angle = angle+math.pi end
 	
 	-- see tmxloader note for bit flip
 	if iszero then
@@ -158,13 +150,17 @@ local getFlipBits = function(x,y,layer)
 			ybit    = not flipy and 2^30 or ybit
 			diagbit = 0
 		elseif isEqualAngle(angle,math.pi/2) then
-			xbit    = not flipx and 2^31 or xbit
-			ybit    = flipy and 2^30 or ybit
+			xbit    = 2^31
+			ybit    = 0
 			diagbit = 2^29
-		elseif isEqualAngle(angle,3*math.pi/4) then
-			xbit    = flipx and 2^31 or xbit
-			ybit    = not flipy and 2^30 or ybit
+			if flipx then ybit = 2^30 end
+			if flipy then xbit = 0 end
+		elseif isEqualAngle(angle,-math.pi/2) then
+			xbit    = 0
+			ybit    = 2^30
 			diagbit = 2^29
+			if flipx then ybit = 0 end
+			if flipy then xbit = 2^31 end
 		end
 	end
 		

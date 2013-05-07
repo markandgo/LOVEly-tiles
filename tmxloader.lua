@@ -281,26 +281,28 @@ local streamData = function(tmxmap,layer)
 			local flips       = math.floor(num / 2^29)
 			local xflip       = math.floor(flips / 4) == 1
 			local yflip       = math.floor( (flips % 4) / 2) == 1
-			local antidiagflip= flips % 2
+			local diagflip    = flips % 2
 
 --[[
+-\- diag flip first!
 flipx flipy diagflip --> flipx flipy angle -- or --> flipx flipy angle
 1     0     1            0     0      90             1     1     -90     
-1     1     1            0     1      90             1     0     -90
+1     1     1            1     0      90             0     1     -90
 0     1     1            1     1      90             0     0     -90
-0     0     1            1     0      90             0     1     -90
+0     0     1            0     1      90             1     0     -90
 --]]
 			
 			local angle = 0
-			if antidiagflip == 1 then
-				angle = math.pi/2
-				xflip = not xflip
+			if diagflip == 1 then
+				angle      = math.pi/2
+				xflip,yflip= yflip,not xflip
 			end
-			if xflip and yflip then angle = angle + math.pi; xflip,yflip = false,false end
+			if xflip and yflip then angle = -angle; xflip,yflip = false,false end
 			
 			local y = math.ceil(count/w)
 			local x = count - (y-1)*w
 			
+			print(x-1,y-1,math.floor(flips / 4),math.floor( (flips % 4) / 2),flips % 2)
 			coroutine.yield(gid,x,y,angle,xflip,yflip)
 		end
 	end)

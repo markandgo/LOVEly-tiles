@@ -12,10 +12,10 @@ local lg    = love.graphics
 
 local dummyquad = lg.newQuad(0,0,1,1,1,1)
 
-local getSBrange = function(x,y,w,h,sw,sh)
-	local gx,gy  = floor(x/sw)+1,floor(y/sh)+1
-	local gx2,gy2= ceil((x+w)/sw),ceil((y+h)/sh)
-	return gx,gy,gx2,gy2
+local getSBrange = function(tx,ty,tx2,ty2,sw,sh)
+	local sbx,sby  = ceil(tx/sw),ceil(ty/sh)
+	local sbx2,sby2= ceil(tx2/sw),ceil(ty2/sh)
+	return sbx,sby,sbx2,sby2
 end
 
 local isoToScreen = function(ix,iy,tw,th)
@@ -28,16 +28,13 @@ local setQuad = function(self,t)
 	t.sb:setq( t.id,t.quad, t.x+self.hw,t.y+self.hh, t.angle, t.sx,t.sy, self.hw,self.hh)	
 end
 
-local preallocateSB = function(self,gx,gy)	
-	self.sbrows= max(self.sbcols,gx)
-	self.sbcols= max(self.sbrows,gy)
-	
+local preallocateSB = function(self,sbx,sby)	
 	local sb   = lg.newSpriteBatch(self.image,PREALLOCATE_SB_SIZE)
 	sb:bind()
-	grid.set(self,gx,gy,sb)
+	grid.set(self,sbx,sby,sb)
 	
 	local qw,qh       = self.atlas:getqSize()
-	local tox,toy     = self.SBwidth*(gx-1),self.SBheight*(gy-1)
+	local tox,toy     = self.SBwidth*(sbx-1),self.SBheight*(sby-1)
 	for y = 1,self.SBheight do
 		for x = 1,self.SBwidth do
 		
@@ -90,13 +87,11 @@ function isomap.new(image,atlas, tw,th)
 	self.image    = image
 	self.imagepath= nil
 	self.atlaspath= nil
-	self.gx       = nil
-	self.gy       = nil
-	self.gx2      = nil
-	self.gy2      = nil
-	self.sbrows   = 0
-	self.sbcols   = 0
-	self.quads    = setmetatable({},{__mode = 'kv'})
+	self.sbx      = 1
+	self.sby      = 1
+	self.sbx2     = 0
+	self.sby2     = 0
+	self.quads    = setmetatable({},{__mode= 'kv'})
 	self.atlas    = atlas
 	self.hw       = qw/2
 	self.hh       = qh/2
@@ -110,8 +105,8 @@ function isomap:setAtlasIndex(tx,ty,index, angle,flipx,flipy)
 	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
-		local gx,gy = getSBrange(tx-1,ty-1,1,1,self.SBwidth,self.SBheight)
-		preallocateSB(self,gx,gy)
+		local sbx,sby = getSBrange(tx,ty,tx,ty,self.SBwidth,self.SBheight)
+		preallocateSB(self,sbx,sby)
 		t = grid.get(self.tilegrid,tx,ty)
 	end
 	
@@ -134,15 +129,6 @@ function isomap:setAtlasIndex(tx,ty,index, angle,flipx,flipy)
 	t.sy      = flipy and -1 or 1
 	
 	setQuad(self,t)
-end
-
-function isomap:draw(x,y,r, sx,sy, ox,oy, kx,ky)
-	local gx,gy,gx2,gy2= self.gx,self.gy,self.gx2,self.gy2
-	ox,oy              = ox or 0,oy or 0
-	if not gx then gx,gy,gx2,gy2 = 1,1,self.sbcols,self.sbrows end
-	for gx,gy,sb in grid.rectangle(self,gx,gy,gx2,gy2,true) do
-		lg.draw(sb, x,y,r, sx,sy, ox+self.tw/2,oy, kx,ky)
-	end
 end
 
 return isomap

@@ -10,19 +10,19 @@ local lg    = love.graphics
 
 local dummyquad = lg.newQuad(0,0,1,1,1,1)
 
-local getSBrange = function(x,y,w,h,sw,sh)
-	local gx,gy  = floor(x/sw)+1,floor(y/sh)+1
-	local gx2,gy2= ceil((x+w)/sw),ceil((y+h)/sh)
-	return gx,gy,gx2,gy2
+local getSBrange = function(tx,ty,tx2,ty2,sw,sh)
+	local sbx,sby  = ceil(tx/sw),ceil(ty/sh)
+	local sbx2,sby2= ceil(tx2/sw),ceil(ty2/sh)
+	return sbx,sby,sbx2,sby2
 end
 
-local preallocateSB = function(self,gx,gy)
+local preallocateSB = function(self,sbx,sby)
 	local sb = lg.newSpriteBatch(self.image,PREALLOCATE_SB_SIZE)
 	sb:bind()
-	grid.set(self,gx,gy,sb)
-	local ox,oy       = (gx-1)*self.SBwidth,(gy-1)*self.SBheight
+	grid.set(self,sbx,sby,sb)
+	local ox,oy       = (sbx-1)*self.SBwidth,(sby-1)*self.SBheight
 	local qrows,qcols = self.SBwidth/self.tw, self.SBheight/self.th
-	local tox,toy     = qcols*(gx-1),qrows*(gy-1)
+	local tox,toy     = qcols*(sbx-1),qrows*(sby-1)
 	for y = 1,qrows do
 		for x = 1,qcols do
 			local tiledata= {
@@ -70,18 +70,18 @@ function map.new(image,atlas, tw,th)
 	local qrows  = floor(sqrt(PREALLOCATE_SB_SIZE))
 	local qcols  = qrows
 	
-	self.SBwidth = qcols*tw
-	self.SBheight= qrows*th	
+	self.SBwidth = qcols
+	self.SBheight= qrows
 	
 	self.tilegrid = grid.new()
 	self.image    = image
 	self.imagepath= nil
 	self.atlaspath= nil
-	self.gx       = nil
-	self.gy       = nil
-	self.gx2      = nil
-	self.gy2      = nil
-	self.quads    = setmetatable({},{__mode = 'kv'})
+	self.sbx      = 1
+	self.sby      = 1
+	self.sbx2     = 0
+	self.sby2     = 0
+	self.quads    = setmetatable({},{__mode= 'kv'})
 	self.atlas    = atlas
 	self.hw       = qw/2
 	self.hh       = qh/2
@@ -117,9 +117,8 @@ function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)
 	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
-		local rx,ry= self.tw*(tx-1),self.th*(ty-1)
-		local gx,gy= getSBrange(rx,ry,self.tw,self.th,self.SBwidth,self.SBheight)
-		preallocateSB(self,gx,gy)
+		local sbx,sby= getSBrange(tx,ty,tx,ty,self.SBwidth,self.SBheight)
+		preallocateSB(self,sbx,sby)
 		
 		t = grid.get(self.tilegrid,tx,ty)
 	end
@@ -219,16 +218,13 @@ function map:getAngle(tx,ty)
 	return tiledata and tiledata.angle
 end
 
-function map:setViewport(x,y,w,h)
-	if not x then self.gx,self.gy,self.gx2,self.gy2 = nil end
-	self.gx,self.gy,self.gx2,self.gy2 = getSBrange(x,y,w,h,self.SBwidth,self.SBheight)
+function map:setViewport(tx,ty,tx2,ty2)
+	self.sbx,self.sby,self.sbx2,self.sby2 = getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
 end
 
 function map:draw(...)
-	local gx,gy,gx2,gy2 = self.gx,self.gy,self.gx2,self.gy2
-	local iterate       = grid.rectangle
-	if not gx then iterate = grid.iterate end
-	for gx,gy,sb in iterate(self,gx,gy,gx2,gy2,true) do
+	local sbx,sby,sbx2,sby2 = self.sbx,self.sby,self.sbx2,self.sby2
+	for sbx,sby,sb in grid.rectangle(self,sbx,sby,sbx2,sby2,true) do
 		lg.draw(sb, ...)
 	end
 end

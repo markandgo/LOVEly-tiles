@@ -77,10 +77,7 @@ function map.new(image,atlas, tw,th)
 	self.image    = image
 	self.imagepath= nil
 	self.atlaspath= nil
-	self.sbx      = 1
-	self.sby      = 1
-	self.sbx2     = 0
-	self.sby2     = 0
+	self.viewrange={1,1,0,0}
 	self.quads    = setmetatable({},{__mode= 'kv'})
 	self.atlas    = atlas
 	self.hw       = qw/2
@@ -218,12 +215,14 @@ function map:getAngle(tx,ty)
 	return tiledata and tiledata.angle
 end
 
-function map:setViewport(tx,ty,tx2,ty2)
-	self.sbx,self.sby,self.sbx2,self.sby2 = getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
+function map:setViewRange(tx,ty,tx2,ty2)
+	local vr               = self.viewrange
+	vr[1],vr[2],vr[3],vr[4]= getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
 end
 
 function map:draw(...)
-	local sbx,sby,sbx2,sby2 = self.sbx,self.sby,self.sbx2,self.sby2
+	local vr               = self.viewrange
+	local sbx,sby,sbx2,sby2= vr[1],vr[2],vr[3],vr[4]
 	for sbx,sby,sb in grid.rectangle(self,sbx,sby,sbx2,sby2,true) do
 		lg.draw(sb, ...)
 	end

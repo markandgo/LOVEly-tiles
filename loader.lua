@@ -164,7 +164,7 @@ function l.loadMap(path)
 	
 	mapobject:setAtlasPath(t.atlaspath)
 	mapobject:setImagePath(t.imagepath)
-	mapobject:setViewport(1,1,maparray.width,maparray.height)
+	mapobject:setViewRange(1,1,maparray.width,maparray.height)
 	
 	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do
 		local isIndex = type(v) == 'number'

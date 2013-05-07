@@ -72,32 +72,7 @@ local isomap   = setmetatable({},{__call = function(self,...) return self.new(..
 isomap.__index = isomap
 
 function isomap.new(image,atlas, tw,th)
-	local self   = grid.new()
-	
-	local qw,qh  = atlas:getqSize()
-	tw,th        = tw or qw,th or tw or qh
-	
-	local qrows  = floor(sqrt(PREALLOCATE_SB_SIZE))
-	local qcols  = qrows
-	
-	self.SBwidth = qcols
-	self.SBheight= qrows
-	
-	self.tilegrid = grid.new()
-	self.image    = image
-	self.imagepath= nil
-	self.atlaspath= nil
-	self.sbx      = 1
-	self.sby      = 1
-	self.sbx2     = 0
-	self.sby2     = 0
-	self.quads    = setmetatable({},{__mode= 'kv'})
-	self.atlas    = atlas
-	self.hw       = qw/2
-	self.hh       = qh/2
-	self.tw       = tw
-	self.th       = th
-	
+	local self = map.new(image,atlas,tw,th)	
 	return setmetatable(self,isomap)
 end
 

@@ -3,6 +3,7 @@ local grid     = require (path..'grid')
 local atlas    = require (path..'atlas')
 local map      = require (path..'map')
 local isomap   = require (path..'isomap')
+local mapdata  = require (path..'mapdata')
 local drawlist = require (path..'drawlist')
 local serialize= require (path..'ext.serialize')
 
@@ -101,19 +102,18 @@ function l.saveMap(map,path)
 		th       = map.th,
 		imagepath= map.imagepath,
 		atlaspath= map.atlaspath or name..DEFAULT_ATLAS_EXTENSION,
-		tilegrid = grid.new(),
+		maparray = map:export(),
 		type     = class == isomap and 'isometric' or 'orthogonal'
 	}
 	
-	local grid = map.tilegrid
+	local grid  = map.tilegrid
+	local array = t.maparray
 	for x,y,v in grid:iterate() do
 		local index = v.index
 		if index then
-			local no_flip_meta = v.sx == 1 and v.sy == 1
-			local no_angle_meta= v.angle == 0
-			if no_angle_meta and no_flip_meta and not v.property then
-				grid.set(t.tilegrid,x,y,index)
-			else
+			local flip_meta = v.sx ~= 1 or v.sy ~= 1
+			local angle_meta= v.angle ~= 0
+			if angle_meta or flip_meta then
 				local p   = {
 					index   = nil,
 					sx      = nil,
@@ -122,14 +122,15 @@ function l.saveMap(map,path)
 					property= nil,
 				}
 				p.index   = index
-				if not no_flip_meta then
+				if flip_meta then
 					p.sx,p.sy = v.sx,v.sy
 				end
-				if not no_angle_meta then
+				if angle_meta then
 					p.angle = v.angle
 				end
-				p.property = copyProperty(v.property)
-				grid.set(t.tilegrid,x,y,p)
+				p.property= copyProperty(v.property)
+				local i   = (y-1)*array.width+x
+				array[i]  = p
 			end
 		end
 	end
@@ -158,16 +159,17 @@ function l.loadMap(path)
 	local maptype    = t.type
 	local mapNew     = maptype== 'orthogonal' and map.new or isomap.new
 	local mapobject  = mapNew(image,atlas,t.tw,t.th)
+	local maparray   = t.maparray
+	local maptilegrid= mapobject.tilegrid
 	
 	mapobject:setAtlasPath(t.atlaspath)
 	mapobject:setImagePath(t.imagepath)
+	mapobject:setViewport(1,1,maparray.width,maparray.height)
 	
-	local maptilegrid= mapobject.tilegrid
-	
-	for x,y,v in grid.iterate(t.tilegrid) do
+	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do
 		local isIndex = type(v) == 'number'
 		if isIndex then
-			mapobject:setAtlasIndex(x,y,v)
+			if v > 0 then mapobject:setAtlasIndex(x,y,v) end
 		else
 			mapobject:setAtlasIndex(x,y,v.index)
 			local mv   = maptilegrid(x,y)
@@ -200,6 +202,8 @@ function l.saveDrawList(drawlist,path)
 			}
 			local mappath = removeUpDirectory(dir..mapname)
 			l.saveMap(layer,mappath)
+		else
+			layers[i] = {name = 'dummy layer'}
 		end
 	end
 	return serialize.save(t,path)
@@ -216,9 +220,14 @@ function l.loadDrawList(path)
 	dl:setTranslation(t.x,t.y)
 	
 	for i,layer in ipairs(t.layers) do
-		local mappath = removeUpDirectory(dir..layer.path)
-		local map     = l.loadMap(mappath)
-		dl:insert(map,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
+		if layer.name == 'dummy layer' then
+			local dummy = {draw = function() end}
+			dl:insert(dummy,i)
+		else
+			local mappath = removeUpDirectory(dir..layer.path)
+			local map     = l.loadMap(mappath)
+			dl:insert(map,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
+		end
 	end
 	return dl
 end

@@ -345,7 +345,7 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	map.imagepath = tileset.imagepath
 	map.properties= layer.properties
 	map.opacity   = layer.opacity
-	
+	map:setViewport(1,1,tmxmap.width,tmxmap.height)
 	map:setAtlasPath(tileset.name..'.atlas')
 	return tileset,map
 end

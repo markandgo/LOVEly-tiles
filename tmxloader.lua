@@ -10,6 +10,10 @@ local unb64     = require ('mime').unb64
 local deflate   = require(path..'ext.deflate')
 local imageCache= setmetatable({},{__mode== 'v'})
 
+-- ==============================================
+-- ADDONS/HACK
+-- ==============================================
+
 -- hack for offset/opacity/align to bottom left
 local function proxyDraw(self,draw,x,y,...)
 	local opacity = self.opacity
@@ -34,6 +38,40 @@ local function applyTmxStyleToDraw(map)
 	function map:draw(...)
 		proxyDraw(self,olddraw,...)
 	end
+end
+
+-- new methods
+function atlas:getTileOffsets()
+	local to = self.atlas.tileoffset
+	return to.x,to.y
+end
+
+function atlas:getTilesetProperty(name)
+	return self.properties[name]
+end
+
+function atlas:setTilesetProperty(name,value)
+	self.properties[name] = value
+end
+
+function map:getOpacity()
+	return self.opacity
+end
+
+function map:getLayerProperty(name)
+	return self.properties[name]
+end
+
+function map:setLayerProperty(name,value)
+	self.properties[name] = value
+end
+
+function drawlist:getLayerName(name)
+	return self.layernames[name]
+end
+
+function drawlist:getAtlas(name)
+	return self.atlases[name]
 end
 
 -- ==============================================

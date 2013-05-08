@@ -15,14 +15,15 @@ local indexToCoord = function(atlas,index)
 end
 
 local getq = function(self,index)
-	return grid.get(self,indexToCoord(self,index)).quad
+	local cell = grid.get(self,indexToCoord(self,index))
+	return cell and cell.quad or error ('Atlas index is out of range')
 end
 
 -------------------
 -- MODULE
 -------------------
 
-local atlas  = {}
+local atlas  = setmetatable({},{__call = function(self,...) return self.new(...) end})
 atlas.__index= atlas
 
 atlas.__call = function(self,index)
@@ -31,7 +32,9 @@ end
 
 function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,atlasHeight,  ox,oy,  xspacing,yspacing)
 	local iw,ih,qw,qh,aw,ah,xs,ys = imageWidth,imageHeight,quadWidth,quadHeight,atlasWidth,atlasHeight,xspacing,yspacing
+	
 	local self  = grid.new()
+	qh          = qh or qw
 	ox,oy       = ox or 0,oy or 0
 	xs,ys       = xs or 0,ys or 0
 	aw          = aw or iw
@@ -78,7 +81,7 @@ function atlas:getViewport()
 	return self.ox,self.oy,self.aWidth,self.aHeight
 end
 
-function atlas:getqSpacings()
+function atlas:getSpacings()
 	return self.xs,self.ys
 end
 

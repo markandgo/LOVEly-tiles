@@ -1,5 +1,5 @@
 local gr= love.graphics
-local s = {name = 'string source'}
+local s = {name = 'map loading/editing'}
 
 function s:load()
 	atlas   = require 'lib.atlas'
@@ -34,18 +34,13 @@ function s:load()
 	map:setAngle(2,1,3.14/2)
 	map:setAtlasIndex(3,1)
 	
-	function render()
-		map:setViewport(x,y,800,600)		
-		map:draw()			
-	end	
-		
 	x,y     = 0,0
 	vx,vy   = 0,0
 	velocity= 400
 end
 
 function s:keypressed(k)
-	if k == ' ' then state = require 'tablestate' state:load() end
+	if k == ' ' then state = require 'isometric' state:load() end
 	if type(tonumber(k)) == 'number' then
 		if tonumber(k) <= 4 then
 			map:setAtlasIndex(1,1,tonumber(k))
@@ -93,16 +88,10 @@ function s:draw()
 	gr.push()
 		gr.translate(-math.floor(x),-math.floor(y))
 		gr.rectangle('line',0,0,800,600)
-		render()	
+		map:setViewRange(1,1,100,100)		
+		map:draw()	
 	gr.pop()
 	
-	-- minimap showing chunks in view
-	gr.push()		
-		gr.translate(600,0)
-		gr.scale(0.25)
-		gr.rectangle('line',0,0,800,600)		
-		render()	
-	gr.pop()
 	gr.rectangle('line',600,0,200,150)
 	gr.print('Right mouse click to erase a tile',0,576)
 	gr.print('Left mouse click to add/change a tile',0,588)

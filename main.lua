@@ -1,15 +1,15 @@
 function love.load()
-	state = require 'scrollstate'
+	state = require 'scrolling'
 	state:load()
 end
 
 function love.keypressed(k)
-	state:keypressed(k)
+	if state.keypressed then state:keypressed(k) end
 	if k == 'escape' then love.event.push('quit') end
 end
 
 function love.keyreleased(k)
-	state:keyreleased(k)
+	if state.keyreleased then state:keyreleased(k) end
 end
 
 function love.mousepressed(x,y,b)

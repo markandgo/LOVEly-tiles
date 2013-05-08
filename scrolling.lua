@@ -1,8 +1,8 @@
 local gr= love.graphics
-local s = {name = 'scrolling'}
+local s = {name = 'scrolling test'}
 
 function s:load()
-	ds    = require 'lib.drawstack'
+	dl    = require 'lib.drawlist'
 	
 	kirby = gr.newImage('kirby.png')
 	foreground = gr.newQuad(6,419,577,216,787,641)
@@ -18,10 +18,10 @@ function s:load()
 		gr.drawq(kirby,foreground,0,0) 
 	end
 	
-	scene = ds.new()
+	scene = dl.new()
 	
-	scene:add(layer1,1,1/2)
-	scene:add(layer2,2)
+	scene:insert(layer1,1,1/2)
+	scene:insert(layer2,2,0)
 	
 	x,y     = 0,0
 	vx,vy   = 0,0
@@ -29,7 +29,7 @@ function s:load()
 end
 
 function s:keypressed(k)
-	if k == ' ' then state = require 'stringstate' state:load() end
+	if k == ' ' then state = require 'maptest' state:load() end
 	if k == 'd' then
 		vx = velocity
 	end
@@ -51,6 +51,7 @@ function s:keyreleased(k)
 	if k == 'w' or k == 's' then
 		vy = 0
 	end
+	if k == 'q' then scene:swap(1,2) end
 end
 
 function s:update(dt)
@@ -65,6 +66,7 @@ function s:draw()
 	gr.translate(-x,-y)
 	scene:draw()
 	gr.pop()
+	love.graphics.print('Press q to swap layer',0,100)
 end
 
 return s

@@ -1,4 +1,4 @@
-local grid  = {}
+local grid  = setmetatable({},{__call = function(self,...) return self.new(...) end})
 grid.__index= grid
 
 grid.__call = function(self,x,y)

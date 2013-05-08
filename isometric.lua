@@ -9,7 +9,7 @@ function s:load()
 	sheet = gr.newImage('isotile.png')
 	sheet:setFilter('linear','nearest')
 	
-	sheetatlas = atlas.new(640,1024, 64,64)
+	sheetatlas = atlas.new(sheet:getWidth(),sheet:getHeight(), 64,64)
 		
 	local mapsource =[[
 xxxxx  xxxx   xxxx   xxxxx
@@ -28,6 +28,7 @@ xxxxx  xxxx   xxxx   xxxxx
 	map:setFlip(1,1,true,false)
 	map:setAngle(5,1,3.14)
 	map:setAtlasIndex(3,1)
+	map:setViewRange(1,1,100,100)
 		
 	x,y     = 0,0
 	vx,vy   = 0,0
@@ -35,7 +36,7 @@ xxxxx  xxxx   xxxx   xxxxx
 end
 
 function s:keypressed(k)
-	if k == ' ' then state = require 'scrollstate' state:load() end
+	if k == ' ' then state = require 'tmxtest' state:load() end
 	if k == 'd' then
 		vx = velocity
 	end

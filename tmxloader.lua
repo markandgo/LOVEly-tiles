@@ -420,8 +420,9 @@ end
 -- ==============================================
 -- TMX LOADER
 -- ==============================================
+local DEFAULT_CHUNK_SIZE = 1000
 
-return function(filename)
+local worker = function(filename,mode,chunkSize)
 	local tmxmap,err = tmxToTable(filename)
 	if err then return nil,err end
 	
@@ -430,6 +431,9 @@ return function(filename)
 	
 	buildAtlasesAndImages(tmxmap)
 	storeAtlasesByName(tmxmap,dl)
+	
+	local chunkSize  = chunkSize or DEFAULT_CHUNK_SIZE
+	local chunkCount = 0
 	
 	for i,layer in ipairs(tmxmap.layers) do
 		local isTileLayer = layer.data
@@ -444,6 +448,11 @@ return function(filename)
 					local index = gid-firstgid+1
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
 				end
+				chunkCount = chunkCount + 1
+				if mode == 'chunk' and chunkCount == chunkSize then 
+					chunkCount = 0
+					coroutine.yield() 
+				end
 			end
 			dl:insert(map,nil,1,1,layer.visible ~= 0) 
 			dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
@@ -451,9 +460,30 @@ return function(filename)
 			function layer:draw() end
 			if layer.image then buildImage(tmxmap,layer) else layer.__element = 'objectgroup' end
 			dl:insert(layer)
+			chunkCount = chunkCount + 1
+		end
+		
+		if mode == 'chunk' and chunkCount == chunkSize then 
+			chunkCount = 0
+			coroutine.yield() 
 		end
 	end
 	storeLayersByName(tmxmap,dl)
 	
 	return dl
+end
+
+return function(filename,mode,chunkSize)
+	mode = mode or 'all'
+	assert(mode == 'all' or mode == 'chunk', 'Invalid mode as 2nd argument')
+	if mode == 'chunk' then
+		local co = coroutine.wrap(worker)
+		local loader = function()
+			local map,err = co(filename,mode,chunkSize)
+			return map,err
+		end
+		return loader
+	else
+		return worker(filename,mode)
+	end
 end

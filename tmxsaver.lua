@@ -297,9 +297,9 @@ local function prepareTable(drawlist,path)
 			local newgid = makeAndInsertTileset(layer,atlasDone,tilesets,firstgid)
 			makeAndInsertTileLayer(drawlist,i,layer,layers,atlasDone)
 			firstgid = newgid or firstgid
-		elseif layer.objects then
+		elseif layer.__element == 'objectgroup' then
 			makeAndInsertObjGroup(layer,layers)
-		elseif layer.image then
+		elseif layer.__element == 'imagelayer' then
 			local _,name = getPathComponents(layer.imagepath)
 			local imagelayer  = {
 				__element= 'imagelayer',

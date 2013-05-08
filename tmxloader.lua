@@ -319,6 +319,7 @@ local function buildImage(tmxmap,parent)
 	imageCache[path]= image
 	parent.image    = image
 	parent.imagepath= imagetable.source
+	parent.__element= 'imagelayer'
 end
 
 local function mergeExternalTSX(tmxmap,tileset)
@@ -448,7 +449,7 @@ return function(filename)
 			dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
 		else
 			function layer:draw() end
-			if layer.image then buildImage(tmxmap,layer) end
+			if layer.image then buildImage(tmxmap,layer) else layer.__element = 'objectgroup' end
 			dl:insert(layer)
 		end
 	end

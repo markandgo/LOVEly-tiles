@@ -191,19 +191,19 @@ function l.saveDrawList(drawlist,path)
 	
 	for i,layer in pairs(drawlist.layers) do
 		local settings = drawlist.settings[layer]
+		local mapname  = settings.path or name..'_layer_'..i..DEFAULT_MAP_EXTENSION
+		layers[i] = {
+			isDrawable  = settings.isDrawable,
+			xtransfactor= settings.xtransfactor,
+			ytransfactor= settings.ytransfactor,
+			path        = mapname,
+		}
 		local class    = getmetatable(layer)
 		if class == map or class == isomap then
-			local mapname  = settings.path or name..'_layer_'..i..DEFAULT_MAP_EXTENSION
-			layers[i] = {
-				isDrawable  = settings.isDrawable,
-				xtransfactor= settings.xtransfactor,
-				ytransfactor= settings.ytransfactor,
-				path        = mapname,
-			}
 			local mappath = removeUpDirectory(dir..mapname)
 			l.saveMap(layer,mappath)
 		else
-			layers[i] = {name = 'dummy layer'}
+			layers[i].path = 'dummy layer'
 		end
 	end
 	return serialize.save(t,path)
@@ -220,14 +220,14 @@ function l.loadDrawList(path)
 	dl:setTranslation(t.x,t.y)
 	
 	for i,layer in ipairs(t.layers) do
-		if layer.name == 'dummy layer' then
-			local dummy = {draw = function() end}
-			dl:insert(dummy,i)
+		local newlayer
+		if layer.path == 'dummy layer' then
+			newlayer = {draw = function() end}
 		else
 			local mappath = removeUpDirectory(dir..layer.path)
-			local map     = l.loadMap(mappath)
-			dl:insert(map,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
+			newlayer      = l.loadMap(mappath)
 		end
+		dl:insert(newlayer,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
 	end
 	return dl
 end

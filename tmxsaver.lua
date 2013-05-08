@@ -217,7 +217,6 @@ local makeAndInsertObjGroup = function(layer,layers)
 		-- object
 	}
 	
-	local objects = {}
 	for _,obj in ipairs(layer.objects) do
 		local newobj = {
 			__element= 'object',
@@ -249,11 +248,7 @@ local makeAndInsertObjGroup = function(layer,layers)
 		end
 		
 		table.insert(newobj,type)
-		table.insert(objects,newobj)
-	end
-	
-	for i,obj in ipairs(objects) do
-		table.insert(copy,obj)
+		table.insert(copy,newobj)
 	end
 	
 	table.insert(layers,copy)

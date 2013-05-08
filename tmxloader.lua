@@ -301,7 +301,7 @@ flipx flipy diagflip --> flipx flipy angle -- or --> flipx flipy angle
 				angle      = math.pi/2
 				xflip,yflip= yflip,not xflip
 			end
-			if xflip and yflip then angle = math.pi; xflip,yflip = false,false end
+			if xflip and yflip then angle = angle+math.pi; xflip,yflip = false,false end
 			
 			local y = math.ceil(count/w)
 			local x = count - (y-1)*w

@@ -20,8 +20,9 @@ local preallocateSB = function(self,sbx,sby)
 	local sb = lg.newSpriteBatch(self.image,PREALLOCATE_SB_SIZE)
 	sb:bind()
 	grid.set(self,sbx,sby,sb)
-	local ox,oy       = (sbx-1)*self.SBwidth,(sby-1)*self.SBheight
-	local qrows,qcols = self.SBwidth/self.tw, self.SBheight/self.th
+	local tw,th       = self:getTileSize()
+	local ox,oy       = (sbx-1)*self.SBwidth*tw,(sby-1)*self.SBheight*th
+	local qrows,qcols = self.SBwidth, self.SBheight
 	local tox,toy     = qcols*(sbx-1),qrows*(sby-1)
 	for y = 1,qrows do
 		for x = 1,qcols do
@@ -116,7 +117,6 @@ function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)
 	if not t then
 		local sbx,sby= getSBrange(tx,ty,tx,ty,self.SBwidth,self.SBheight)
 		preallocateSB(self,sbx,sby)
-		
 		t = grid.get(self.tilegrid,tx,ty)
 	end
 	

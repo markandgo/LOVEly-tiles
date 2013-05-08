@@ -92,7 +92,6 @@ function s:draw()
 		map:draw()	
 	gr.pop()
 	
-	gr.rectangle('line',600,0,200,150)
 	gr.print('Right mouse click to erase a tile',0,576)
 	gr.print('Left mouse click to add/change a tile',0,588)
 end

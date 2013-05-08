@@ -307,7 +307,7 @@ local function prepareTable(drawlist,path)
 				source   = layer.imagepath,
 				width    = layer.image:getWidth(),
 				height   = layer.image:getHeight(),
-				
+				trans    = layer.trans,
 				prepareTableProperties(layer.properties),
 			}
 		

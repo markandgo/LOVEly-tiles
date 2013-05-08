@@ -319,6 +319,7 @@ local function buildImage(tmxmap,parent)
 	imageCache[path]= image
 	parent.image    = image
 	parent.imagepath= imagetable.source
+	parent.trans    = imagetable.trans
 	parent.__element= 'imagelayer'
 end
 

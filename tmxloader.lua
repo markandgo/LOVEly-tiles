@@ -306,7 +306,6 @@ flipx flipy diagflip --> flipx flipy angle -- or --> flipx flipy angle
 			local y = math.ceil(count/w)
 			local x = count - (y-1)*w
 			
-			print(x-1,y-1,math.floor(flips / 4),math.floor( (flips % 4) / 2),flips % 2)
 			coroutine.yield(gid,x,y,angle,xflip,yflip)
 		end
 	end)

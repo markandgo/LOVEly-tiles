@@ -258,7 +258,7 @@ local xmlParser = function(handler)
                 end
             elseif string.sub(tagstr,1,8) == "!DOCTYPE" then
                 -- DTD
-                match,endmatch,attrs = self:_parseDTD(string,pos)
+                match,endmatch,attrs = self:_parseDTD(str,pos)
                 if not match then 
                     self:_err(self._errstr.dtdErr,pos)
                 end 

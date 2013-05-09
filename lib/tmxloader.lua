@@ -427,6 +427,7 @@ local worker = function(filename,mode,chunkSize)
 	if err then return nil,err end
 	
 	local dl = drawlist.new()
+	if mode == 'chunk' then coroutine.yield(dl) end
 	dl.properties = tmxmap.properties
 	
 	buildAtlasesAndImages(tmxmap)
@@ -444,6 +445,9 @@ local worker = function(filename,mode,chunkSize)
 					if not (tileset and map) then
 						tileset,map = getTilesetAndMap(gid,tmxmap,layer)
 						firstgid    = tileset.firstgid
+						
+						dl:insert(map,nil,1,1,layer.visible ~= 0) 
+						dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
 					end
 					local index = gid-firstgid+1
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
@@ -454,8 +458,6 @@ local worker = function(filename,mode,chunkSize)
 					coroutine.yield() 
 				end
 			end
-			dl:insert(map,nil,1,1,layer.visible ~= 0) 
-			dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
 		else
 			function layer:draw() end
 			if layer.image then buildImage(tmxmap,layer) else layer.__element = 'objectgroup' end
@@ -470,19 +472,25 @@ local worker = function(filename,mode,chunkSize)
 	end
 	storeLayersByName(tmxmap,dl)
 	
-	return dl
+	if mode == 'all' then return dl end
 end
 
 return function(filename,mode,chunkSize)
 	mode = mode or 'all'
 	assert(mode == 'all' or mode == 'chunk', 'Invalid mode as 2nd argument')
 	if mode == 'chunk' then
-		local co = coroutine.wrap(worker)
+		local co = coroutine.create(worker)
+		local ok,drawlist,err = coroutine.resume(co,filename,mode,chunkSize)
+		err = not ok and drawlist or err
+		if err then return nil,err end
+		
+		local resume,status = coroutine.resume,coroutine.status
 		local loader = function()
-			local map,err = co(filename,mode,chunkSize)
-			return map,err
+			local ok,err   = resume(co)
+			local finished = status(co) == 'dead'
+			return finished,err
 		end
-		return loader
+		return drawlist,loader
 	else
 		return worker(filename,mode)
 	end

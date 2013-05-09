@@ -21,16 +21,8 @@ function s:update(dt)
 		y = (y or 0)+dt*speed
 	end
 	if isLoading then
-		local newd,err = loader()
-		if not newd and not err then
-			isLoading = true
-		elseif err then
-			error(err)
-		else
-			d2 = newd 
-			isLoading = false
-		end
-	end	
+		if loader() then isLoading = false end
+	end
 end
 
 function s:keypressed(k)
@@ -44,16 +36,8 @@ function s:keypressed(k)
 		d2 = nil
 	end
 	if k == '3' then
-		loader = tmxload ('top.tmx','chunk',100)
-		local newd,err = loader()
-		if not newd and not err then
-			isLoading = true
-		elseif err then
-			error(err)
-		else
-			d2 = newd
-			isLoading = false
-		end
+		d2,loader = tmxload ('top.tmx','chunk',100)
+		isLoading = true
 	end
 end
 

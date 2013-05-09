@@ -46,6 +46,11 @@ function atlas:getTileOffsets()
 	return to.x,to.y
 end
 
+function atlas:setTileOffsets(x,y)
+	local to = self.atlas.tileoffset
+	to.x,to.y= x,y
+end
+
 function atlas:getTilesetProperty(name)
 	return self.properties[name]
 end

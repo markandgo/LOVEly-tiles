@@ -102,7 +102,7 @@ function l.saveMap(map,path)
 		th       = map.th,
 		imagepath= map.imagepath,
 		atlaspath= map.atlaspath or name..DEFAULT_ATLAS_EXTENSION,
-		maparray = map:export(),
+		maparray = map:export(1),
 		type     = class == isomap and 'isometric' or 'orthogonal'
 	}
 	

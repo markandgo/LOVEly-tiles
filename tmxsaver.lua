@@ -169,7 +169,7 @@ end
 
 local makeAndInsertTileLayer = function(drawlist,i,layer,layers,atlasDone)
 	local firstgid= atlasDone[ layer:getAtlas() ]
-	local data    = layer:export()
+	local data    = layer:export(1)
 	
 	for x,y,index in mapdata.array(data,data.width,data.height) do
 		if index ~= 0 then

@@ -89,9 +89,17 @@ function map.new(image,atlas, tw,th)
 	return setmetatable(self,map)
 end
 
-function map:export()
+function map:export(dimension,reverse)
+	assert(dimension == 1 or dimension == 2,'Expected 1 or 2 as dimension argument.')
+	
+	local array
+	if dimension == 1 then
+		array = {}
+	else
+		array = grid.new()
+	end
+	
 	local mapwidth,mapheight = 0,0
-	local maparray = {}
 	for x,y,v in self.tilegrid:iterate() do
 		if v.index then
 			mapwidth = math.max(mapwidth,x)
@@ -104,11 +112,18 @@ function map:export()
 			local t    = grid.get(self.tilegrid,x,y)
 			local i    = x+ioffset
 			local index= t and t.index or 0
-			maparray[i]= index
+			if dimension == 1 then 
+				array[i]=index 
+			else 
+				local i,j = x,y
+				if reverse then i,j = j,i end
+				array:set(i,j,index)
+			end
 		end
 	end
-	maparray.width,maparray.height = mapwidth,mapheight
-	return maparray
+	array = dimension == 2 and array.grid or array
+	array.width,array.height = mapwidth,mapheight
+	return array
 end
 
 function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)

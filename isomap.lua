@@ -9,6 +9,8 @@ local sqrt  = math.sqrt
 local floor = math.floor
 local max   = math.max
 local lg    = love.graphics
+local sbadd = love.graphics.newGeometry and 'addg' or 'addq'
+local sbset = love.graphics.newGeometry  and 'setg' or 'setq'
 
 local dummyquad = lg.newQuad(0,0,1,1,1,1)
 
@@ -25,7 +27,7 @@ local isoToScreen = function(ix,iy,tw,th)
 end
 
 local setQuad = function(self,t)
-	t.sb:setq( t.id,t.quad, t.x+self.hw,t.y+self.hh, t.angle, t.sx,t.sy, self.hw,self.hh)	
+	t.sb[sbset](t.sb, t.id,t.quad, t.x+self.hw,t.y+self.hh, t.angle, t.sx,t.sy, self.hw,self.hh)	
 end
 
 local preallocateSB = function(self,sbx,sby)	
@@ -45,7 +47,7 @@ local preallocateSB = function(self,sbx,sby)
 				index   = nil,
 				property= nil,
 				sb      = sb,
-				id      = sb:addq(dummyquad,0,0,0,0),
+				id      = sb[sbadd](sb,dummyquad,0,0,0,0),
 				x       = rx,
 				y       = ry,
 				angle   = 0,
@@ -92,7 +94,7 @@ function isomap:setAtlasIndex(tx,ty,index, angle,flipx,flipy)
 		t.sx      = nil
 		t.sy      = nil
 		t.property= nil
-		t.sb:setq( t.id, dummyquad, 0,0,0,0)
+		t.sb[sbset](t.sb, t.id, dummyquad, 0,0,0,0)
 		return
 	end
 	

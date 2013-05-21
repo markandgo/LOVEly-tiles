@@ -1,7 +1,15 @@
 function love.load()
-	state = require 'scrolling'
+	--[[######################
+	SET CURRENT STATE
+	--########################]]
+
+	state = require 'scrolling_example'
 	state:load()
 end
+
+--[[######################
+STATE CALLBACKS
+--########################]]
 
 function love.keypressed(k)
 	if state.keypressed then state:keypressed(k) end
@@ -22,6 +30,11 @@ end
 
 function love.draw()
 	state:draw()
+	
+	--[[######################
+	GLOBAL INSTRUCTIONS
+	--########################]]
+	
 	love.graphics.setColor(0,0,0,150)
 	love.graphics.rectangle('fill',0,0,300,100)
 	love.graphics.setColor(255,255,255)

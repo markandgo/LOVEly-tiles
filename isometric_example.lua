@@ -9,6 +9,10 @@ function s:load()
 	sheet = gr.newImage('isotile.png')
 	sheet:setFilter('linear','nearest')
 	
+	--[[######################
+	TEXTURE ATLAS
+	--########################]]
+	
 	sheetatlas = atlas.new(sheet:getWidth(),sheet:getHeight(), 64,64)
 		
 	local mapsource =[[
@@ -19,55 +23,55 @@ xxxxx  xxxx   xxxx   xxxxx
   x    xxxx   xxxx     x
 ]]
 	
+	--[[######################
+	FILL MAP WITH STRING SOURCE
+	--########################]]
+	
 	map = isomap.new(sheet,sheetatlas,64,32)	
 	
 	for x,y,v in md.string(mapsource) do
 		if v == 'x' then map:setAtlasIndex(x,y,{5,4}) end
 	end
 	
+	--[[######################
+	FLIP/ROTATE/HIDE TILES
+	--########################]]
+	
 	map:setFlip(1,1,true,false)
 	map:setAngle(5,1,3.14)
 	map:setAtlasIndex(3,1)
+	
+	--[[######################
+	SET VIEWING RANGE: 100 X 100 TILES
+	--########################]]
+	
 	map:setViewRange(1,1,100,100)
 		
-	x,y     = 0,0
-	vx,vy   = 0,0
-	velocity= 400
+	scroll_speed = 500
+	x,y = 0,0
 end
 
 function s:keypressed(k)
-	if k == ' ' then state = require 'tmxtest' state:load() end
-	if k == 'd' then
-		vx = velocity
-	end
-	if k == 'a' then
-		vx = -velocity
-	end
-	if k == 'w' then
-		vy = -velocity
-	end
-	if k == 's' then
-		vy = velocity
-	end
-end
-
-function s:keyreleased(k)
-	if k == 'd' or k == 'a' then
-		vx = 0
-	end
-	if k == 'w' or k == 's' then
-		vy = 0
-	end
+	if k == ' ' then state = require 'tmx_example' state:load() end
 end
 
 function s:update(dt)
-	dx,dy= vx*dt,vy*dt
-	x    =x+dx y=y+dy
+	if love.keyboard.isDown 'a' then
+		x = x+dt*scroll_speed
+	elseif love.keyboard.isDown 'd' then
+		x = x-dt*scroll_speed
+	end
+	
+	if love.keyboard.isDown 's' then
+		y = y-dt*scroll_speed
+	elseif love.keyboard.isDown 'w' then
+		y = y+dt*scroll_speed
+	end
 end
 
 function s:draw()
 	gr.push()
-		gr.translate(-x,-y)
+		gr.translate(x,y)
 		gr.rectangle('line',0,0,800,600)
 		map:draw()			
 	gr.pop()

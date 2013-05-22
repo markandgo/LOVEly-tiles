@@ -16,6 +16,7 @@ local imageCache= setmetatable({},{__mode== 'v'})
 
 -- hack for offset/opacity/align to bottom left
 local function proxyDraw(self,draw,x,y,...)
+	x,y           = x or 0,y or 0
 	local opacity = self.opacity
 	local lg      = love.graphics
 	local r,g,b,a

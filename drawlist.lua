@@ -115,7 +115,7 @@ function t:draw(...)
 		local dx,dy   = xfactor*self.x, yfactor*self.y
 		love.graphics.translate(dx,dy)
 		if set[layer].isDrawable then
-			layer:draw(...)
+			if layer.draw then layer:draw(...) end
 		end
 		love.graphics.pop()
 	end

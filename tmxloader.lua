@@ -444,6 +444,7 @@ local worker = function(filename,mode,chunkSize)
 	
 	for i,layer in ipairs(tmxmap.layers) do
 		local isTileLayer = layer.data
+		local name        = layer.name ~= '' and layer.name or 'layer'..i
 		if isTileLayer then
 			local tileset,map,firstgid
 			for gid,x,y,angle,flipx,flipy in streamData(tmxmap,layer) do
@@ -452,8 +453,8 @@ local worker = function(filename,mode,chunkSize)
 						tileset,map = getTilesetAndMap(gid,tmxmap,layer)
 						firstgid    = tileset.firstgid
 						
-						dl:insert(map,nil,1,1,layer.visible ~= 0) 
-						dl:setLayerPath(dl:totalLayers(),layer.name..'.map')
+						dl:insert(map,nil,1,1,layer.visible ~= 0)
+						dl:setLayerPath(dl:totalLayers(),name..'.map')
 					end
 					local index = gid-firstgid+1
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
@@ -465,7 +466,6 @@ local worker = function(filename,mode,chunkSize)
 				end
 			end
 		else
-			function layer:draw() end
 			if layer.image then buildImage(tmxmap,layer) else layer.__element = 'objectgroup' end
 			dl:insert(layer)
 			chunkCount = chunkCount + 1

@@ -197,13 +197,14 @@ function l.saveDrawList(drawlist,path)
 			xtransfactor= settings.xtransfactor,
 			ytransfactor= settings.ytransfactor,
 			path        = mapname,
+			isDummy     = nil,
 		}
 		local class    = getmetatable(layer)
 		if class == map or class == isomap then
 			local mappath = removeUpDirectory(dir..mapname)
 			l.saveMap(layer,mappath)
 		else
-			layers[i].path = 'dummy layer'
+			layers[i].isDummy = true
 		end
 	end
 	return serialize.save(t,path)
@@ -221,8 +222,8 @@ function l.loadDrawList(path)
 	
 	for i,layer in ipairs(t.layers) do
 		local newlayer
-		if layer.path == 'dummy layer' then
-			newlayer = {draw = function() end}
+		if layer.isDummy then
+			newlayer = {}
 		else
 			local mappath = removeUpDirectory(dir..layer.path)
 			newlayer      = l.loadMap(mappath)

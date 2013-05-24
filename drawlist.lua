@@ -52,20 +52,17 @@ function t:swap(i,i2)
 	self.layers[i],self.layers[i2] = self.layers[i2],self.layers[i]
 end
 
+local directions = {
+	down = function(index,layers) layers[index-1],layers[index] = layers[index],layers[index-1] end, 
+	up   = function(index,layers) layers[index+1],layers[index] = layers[index],layers[index+1] end, 
+	front= function(index,layers) table.insert(layers, table.remove(layers,index) )             end, 
+	back = function(index,layers) table.insert(layers, 1, table.remove(layers,index) )          end,  
+}
+
 function t:move(i,direction)
 	assert(i > 0,'layer index cannot be less than 1')
-	local oi
-	if direction == 'down' then
-		oi = -1
-	elseif direction == 'up' then
-		oi = 1
-	else 
-		error('invalid direction value')
-	end
-	local layer     = self.layers[i]
-	local otherlayer= self.layers[i+oi]
-	assert(layer and otherlayer,'Cannot move layer out of sequence')
-	self.layers[i] = otherlayer; self.layers[i+oi]=layer
+	assert(directions[direction],'Invalid direction')
+	directions[direction](i,self.layers)
 end
 
 function t:sort(func)

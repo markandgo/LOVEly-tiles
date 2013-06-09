@@ -491,9 +491,12 @@ return function(filename,mode,chunkSize)
 		if err then return nil,err end
 		
 		local resume,status = coroutine.resume,coroutine.status
+		local load_done
 		local loader = function()
+			if load_done then return true end
 			local ok,err   = resume(co)
 			local finished = status(co) == 'dead'
+			load_done      = finished and not err
 			return finished,err
 		end
 		return drawlist,loader

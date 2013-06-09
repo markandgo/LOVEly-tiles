@@ -32,8 +32,9 @@ function s:update(dt)
 	RETURNS TRUE WHEN FINISHED
 	--########################]]
 	
-	if isLoading then
-		if loader() then isLoading = false end
+	if loader then 
+		loader()
+		if loader() then isLoading = false else isLoading = true end
 	end
 end
 
@@ -56,7 +57,6 @@ function s:keypressed(k)
 	
 	if k == '3' then
 		drawlist2,loader = tmxload ('top.tmx','chunk',100)
-		isLoading = true
 	end
 end
 

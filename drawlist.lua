@@ -40,7 +40,7 @@ function t:insert(layer,i,xtransfactor,ytransfactor,isDrawable)
 end
 
 function t:remove(i)
-	table.remove(self.layers,i)
+	return table.remove(self.layers,i)
 end
 
 function t:removeAll()

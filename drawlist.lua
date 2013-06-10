@@ -103,6 +103,17 @@ function t:getTransFactors(i)
 	return self.settings[self.layers[i]].xtransfactor, self.settings[self.layers[i]].ytransfactor
 end
 
+function t:iterate()
+	return ipairs(self.layers)
+end
+
+function t:callback(callback_name,...)
+	if callback_name == 'draw' then return t.draw(self,...) end
+	for i,layer in ipairs(self.layers) do
+		if layer[callback_name] then layer[callback_name](layer,...) end
+	end
+end
+
 function t:draw(...)
 	local set   = self.settings
 	for i,layer in ipairs(self.layers) do

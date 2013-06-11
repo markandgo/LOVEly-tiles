@@ -56,7 +56,7 @@ function s:keypressed(k)
 	--########################]]
 	
 	if k == '3' then
-		drawlist2,loader = tmxload ('top.tmx','chunk',100)
+		drawlist2,loader = tmxload ('top.tmx',10)
 	end
 end
 

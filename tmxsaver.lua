@@ -304,10 +304,13 @@ local function prepareTable(drawlist,path)
 			local imagelayer  = {
 				__element= 'imagelayer',
 				name     = name,
-				source   = layer.imagepath,
-				width    = layer.image:getWidth(),
-				height   = layer.image:getHeight(),
-				trans    = layer.trans,
+				width    = layer.width,
+				height   = layer.height,
+				{
+					__element= 'image',
+					source   = layer.imagepath,
+					trans    = layer.trans,
+				},
 				prepareTableProperties(layer.properties),
 			}
 		

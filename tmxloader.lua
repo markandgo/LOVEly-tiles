@@ -428,18 +428,17 @@ end
 -- ==============================================
 local DEFAULT_CHUNK_SIZE = 1000
 
-local worker = function(filename,mode,chunkSize)
+local worker = function(filename,chunkSize)
 	local tmxmap,err = tmxToTable(filename)
 	if err then return nil,err end
 	
 	local dl = drawlist.new()
-	if mode == 'chunk' then coroutine.yield(dl) end
+	if chunkSize then coroutine.yield(dl) end
 	dl.properties = tmxmap.properties
 	
 	buildAtlasesAndImages(tmxmap)
 	storeAtlasesByName(tmxmap,dl)
 	
-	local chunkSize  = chunkSize or DEFAULT_CHUNK_SIZE
 	local chunkCount = 0
 	
 	for i,layer in ipairs(tmxmap.layers) do
@@ -460,7 +459,7 @@ local worker = function(filename,mode,chunkSize)
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
 				end
 				chunkCount = chunkCount + 1
-				if mode == 'chunk' and chunkCount == chunkSize then 
+				if chunkSize and chunkCount == chunkSize then 
 					chunkCount = 0
 					coroutine.yield() 
 				end
@@ -471,22 +470,20 @@ local worker = function(filename,mode,chunkSize)
 			chunkCount = chunkCount + 1
 		end
 		
-		if mode == 'chunk' and chunkCount == chunkSize then 
+		if chunkSize and chunkCount == chunkSize then 
 			chunkCount = 0
 			coroutine.yield() 
 		end
 	end
 	storeLayersByName(tmxmap,dl)
 	
-	if mode == 'all' then return dl end
+	if not chunkSize then return dl end
 end
 
-return function(filename,mode,chunkSize)
-	mode = mode or 'all'
-	assert(mode == 'all' or mode == 'chunk', 'Invalid mode as 2nd argument')
-	if mode == 'chunk' then
+return function(filename,chunkSize)
+	if chunkSize then
 		local co = coroutine.create(worker)
-		local ok,drawlist,err = coroutine.resume(co,filename,mode,chunkSize)
+		local ok,drawlist,err = coroutine.resume(co,filename,chunkSize)
 		err = not ok and drawlist or err
 		if err then return nil,err end
 		
@@ -501,6 +498,6 @@ return function(filename,mode,chunkSize)
 		end
 		return drawlist,loader
 	else
-		return worker(filename,mode)
+		return worker(filename)
 	end
 end

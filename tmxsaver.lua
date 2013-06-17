@@ -123,7 +123,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 end
 
 local normalizeAngle = function(angle)
-	return math.atan2( math.sin(angle), math.cos(angle) )
+	return angle % (math.pi*2)
 end
 
 local isEqualAngle = function(angle1,angle2)
@@ -153,7 +153,7 @@ local getFlipBits = function(x,y,layer)
 			diagbit = 2^29
 			if flipx then ybit = 2^30 end
 			if flipy then xbit = 0 end
-		elseif isEqualAngle(angle,-math.pi/2) then
+		elseif isEqualAngle(angle,3*math.pi/2) then
 			xbit    = 0
 			ybit    = 2^30
 			diagbit = 2^29

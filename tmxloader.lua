@@ -452,7 +452,7 @@ local worker = function(filename,chunkSize)
 						tileset,map = getTilesetAndMap(gid,tmxmap,layer)
 						firstgid    = tileset.firstgid
 						
-						dl:insert(map,nil,1,1,layer.visible ~= 0)
+						dl:insert(name,map,1,1,layer.visible ~= 0)
 						map:setLayerName(name..'.map')
 					end
 					local index = gid-firstgid+1
@@ -466,7 +466,7 @@ local worker = function(filename,chunkSize)
 			end
 		else
 			if layer.image then buildImage(tmxmap,layer) else layer.__element = 'objectgroup' end
-			dl:insert(layer)
+			dl:insert(layer.name,layer)
 			chunkCount = chunkCount + 1
 		end
 		

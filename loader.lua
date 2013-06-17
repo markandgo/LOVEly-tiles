@@ -230,7 +230,8 @@ function l.loadDrawList(path)
 			newlayer      = l.loadMap(mappath)
 			newlayer:setLayerName(layer.path)
 		end
-		dl:insert(newlayer,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
+		local _,name = getPathComponents(layer.path)
+		dl:insert(name,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
 	end
 	return dl
 end

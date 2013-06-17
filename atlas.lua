@@ -125,4 +125,26 @@ function atlas:draw(image,index,...)
 	drawq(image,getq(self,index),...)
 end
 
+-- ####################################
+-- TMX RELATED FUNCTIONS
+-- ####################################
+
+function atlas:getTileOffsets()
+	local to = self.atlas.tileoffset
+	return to.x,to.y
+end
+
+function atlas:setTileOffsets(x,y)
+	local to = self.atlas.tileoffset
+	to.x,to.y= x,y
+end
+
+function atlas:getTilesetProperty(name)
+	return self.properties[name]
+end
+
+function atlas:setTilesetProperty(name,value)
+	self.properties[name] = value
+end
+
 return atlas

@@ -144,4 +144,16 @@ function t:draw(...)
 	end
 end
 
+-- ####################################
+-- TMX RELATED FUNCTIONS
+-- ####################################
+
+function t:getLayerName(name)
+	return self.layernames[name]
+end
+
+function t:getAtlas(name)
+	return self.atlases[name]
+end
+
 return t

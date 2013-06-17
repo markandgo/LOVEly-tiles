@@ -254,4 +254,24 @@ function map:draw(...)
 	end
 end
 
+-- ####################################
+-- TMX RELATED FUNCTIONS
+-- ####################################
+
+function map:getOpacity()
+	return self.opacity
+end
+
+function map:setOpacity(opacity)
+	self.opacity = opacity
+end
+
+function map:getLayerProperty(name)
+	return self.properties[name]
+end
+
+function map:setLayerProperty(name,value)
+	self.properties[name] = value
+end
+
 return map

@@ -122,23 +122,21 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 	end
 end
 
+local normalizeAngle = function(angle)
+	return math.atan2( math.sin(angle), math.cos(angle) )
+end
+
 local isEqualAngle = function(angle1,angle2)
-	local cos1,sin1 = math.cos(angle1),math.sin(angle1)
-	angle1          = math.atan2(sin1,cos1)
-	
-	local cos2,sin2 = math.cos(angle2),math.sin(angle2)
-	angle2          = math.atan2(sin2,cos2)
-	
 	return math.abs(angle1-angle2) < 0.02
 end
 
 local getFlipBits = function(x,y,layer)
-	local angle   = layer:getAngle(x,y)
+	local angle   = normalizeAngle( layer:getAngle(x,y) )
 	local iszero  = isEqualAngle(angle,0)
 	
 	local flipx,flipy      = layer:getFlip(x,y)
 	local xbit,ybit,diagbit= 0,0,0
-	if flipx and flipy then flipx,flipy = false; angle = angle+math.pi end
+	if flipx and flipy then flipx,flipy = false; angle = normalizeAngle( angle+math.pi ) end
 	
 	-- see tmxloader note for bit flip
 	if iszero then

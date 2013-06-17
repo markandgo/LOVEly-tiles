@@ -29,8 +29,8 @@ function s:load()
 	
 	scene = dl.new()
 	
-	scene:insert(layer1,1,1/2)
-	scene:insert(layer2,2,1)
+	scene:insert('bot',layer1,1/2)
+	scene:insert('top',layer2,1)
 	
 	scroll_speed = 500
 	x,y = 0,0
@@ -41,7 +41,7 @@ function s:keypressed(k)
 end
 
 function s:keyreleased(k)
-	if k == 'q' then scene:swap(1,2) end
+	if k == 'q' then scene:swap('top','bot') end
 end
 
 function s:update(dt)

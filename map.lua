@@ -93,6 +93,7 @@ function map.new(image,atlas, tw,th)
 end
 
 function map:export(dimension,reverse)
+	dimension = dimension or 1
 	assert(dimension == 1 or dimension == 2,'Expected 1 or 2 as dimension argument.')
 	
 	local array

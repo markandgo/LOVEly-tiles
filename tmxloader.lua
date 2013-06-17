@@ -358,13 +358,6 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	return tileset,map
 end
 
-local function storeLayersByName(tmxmap,dl)
-	dl.layernames = {}
-	for i,layer in pairs(tmxmap.layers) do
-		dl.layernames[layer.name] = layer
-	end
-end
-
 local tmxToTable = function(filename)
 	local h        = newHandler()
 	local tmxparser= xmlparser(h)
@@ -432,7 +425,6 @@ local worker = function(filename,chunkSize)
 			coroutine.yield() 
 		end
 	end
-	storeLayersByName(tmxmap,dl)
 	
 	if not chunkSize then return dl end
 end

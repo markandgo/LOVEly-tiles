@@ -319,11 +319,11 @@ end
 
 local function buildImage(tmxmap,parent)
 	local imagetable= parent.image
-	local imagepath = stripExcessSlash(  removeUpDirectory(tmxmap.path..imagetable.source)  )
-	local image     = imageCache[imagepath] or love.graphics.newImage(imagepath)
+	local imagename = stripExcessSlash(  removeUpDirectory(tmxmap.path..imagetable.source)  )
+	local image     = imageCache[imagename] or love.graphics.newImage(imagename)
 	imageCache[path]= image
 	parent.image    = image
-	parent.imagepath= imagetable.source
+	parent.imagename= imagetable.source
 	parent.trans    = imagetable.trans
 	parent.__element= 'imagelayer'
 end
@@ -393,11 +393,11 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	local tileset = chosen
 	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
 	applyTmxStyleToDraw(map)
-	map.imagepath = tileset.imagepath
+	map.imagename = tileset.imagename
 	map.properties= layer.properties
 	map.opacity   = layer.opacity
 	map:setViewRange(1,1,tmxmap.width,tmxmap.height)
-	map:setAtlasPath(tileset.name..'.atlas')
+	map:setAtlasName(tileset.name..'.atlas')
 	return tileset,map
 end
 
@@ -453,7 +453,7 @@ local worker = function(filename,chunkSize)
 						firstgid    = tileset.firstgid
 						
 						dl:insert(map,nil,1,1,layer.visible ~= 0)
-						dl:setLayerPath(dl:totalLayers(),name..'.map')
+						map:setLayerName(name..'.map')
 					end
 					local index = gid-firstgid+1
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)

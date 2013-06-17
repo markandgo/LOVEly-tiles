@@ -14,16 +14,6 @@ function t.new()
 	return setmetatable(d,t)
 end
 
-function t:setLayerPath(i,path)
-	local layer = self.layers[i]
-	self.settings[layer].path = path
-end
-
-function t:getLayerPath(i)
-	local layer = self.layers[i]
-	return self.settings[layer].path
-end
-
 function t:getLayer(i)
 	return self.layers[i]
 end

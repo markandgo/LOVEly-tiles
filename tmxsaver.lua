@@ -64,7 +64,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 		local iw,ih  = atlas:getImageSize()
 		local image  = {
 			__element= 'image',
-			source   = layer:getImagePath(),
+			source   = layer:getImageName(),
 			width    = iw,
 			height   = ih,
 		}
@@ -95,7 +95,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 			y        = to.y
 		} 
 		
-		local _,name = getPathComponents(layer:getAtlasPath())
+		local _,name = getPathComponents(layer:getAtlasName())
 		local tileset= {
 			__element = 'tileset',
 			firstgid  = firstgid,
@@ -186,7 +186,7 @@ local makeAndInsertTileLayer = function(drawlist,i,layer,layers,atlasDone)
 	end
 	local formatteddata = {__element = 'data',encoding = 'csv'; table.concat(rows,',\n')}
 	
-	local _,name = getPathComponents(drawlist:getLayerPath(i))
+	local _,name = getPathComponents(layer:getLayerName())
 	local formattedlayer = {
 		__element= 'layer',
 		name     = name or ('layer '..i),
@@ -300,7 +300,7 @@ local function prepareTable(drawlist,path)
 		elseif layer.__element == 'objectgroup' then
 			makeAndInsertObjGroup(layer,layers)
 		elseif layer.__element == 'imagelayer' then
-			local _,name = getPathComponents(layer.imagepath)
+			local _,name = getPathComponents(layer.imagename)
 			local imagelayer  = {
 				__element= 'imagelayer',
 				name     = name,
@@ -308,7 +308,7 @@ local function prepareTable(drawlist,path)
 				height   = layer.height,
 				{
 					__element= 'image',
-					source   = layer.imagepath,
+					source   = layer.imagename,
 					trans    = layer.trans,
 				},
 				prepareTableProperties(layer.properties),

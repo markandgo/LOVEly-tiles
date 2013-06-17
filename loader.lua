@@ -89,19 +89,19 @@ function l.loadAtlas(path)
 end
 
 function l.saveMap(map,path)
-	if not map.imagepath then return 'Must specify a relative image path (map.imagepath)!' end
+	if not map.imagename then return 'Must specify a relative image path (map.imagename)!' end
 	
 	path              = stripExcessSlash(path)
 	local class       = getmetatable(map)
 	local dir,name,ext= getPathComponents(path)
 	
-	if not love.filesystem.exists( removeUpDirectory(dir..map.imagepath) ) then return 'File does not exist for image path!' end
+	if not love.filesystem.exists( removeUpDirectory(dir..map.imagename) ) then return 'File does not exist for image path!' end
 	
 	local t = {
 		tw       = map.tw,
 		th       = map.th,
-		imagepath= map.imagepath,
-		atlaspath= map.atlaspath or name..DEFAULT_ATLAS_EXTENSION,
+		imagename= map.imagename,
+		atlasname= map.atlasname or name..DEFAULT_ATLAS_EXTENSION,
 		maparray = map:export(1),
 		type     = class == isomap and 'isometric' or 'orthogonal'
 	}
@@ -138,8 +138,8 @@ function l.saveMap(map,path)
 	local _,err = serialize.save(t,path)
 	if err then return false,err end
 	
-	local fullatlaspath = removeUpDirectory(dir..t.atlaspath)
-	return l.saveAtlas(map.atlas,fullatlaspath)
+	local fullatlasname = removeUpDirectory(dir..t.atlasname)
+	return l.saveAtlas(map.atlas,fullatlasname)
 end
 
 function l.loadMap(path)
@@ -149,21 +149,21 @@ function l.loadMap(path)
 	
 	if not t then return nil,'No file was found for the specified path' end
 	
-	local atlaspath   = removeUpDirectory( dir..t.atlaspath )
-	local imagepath   = removeUpDirectory( dir..t.imagepath )
-	local image       = cachedImages[imagepath] or love.graphics.newImage( imagepath )
+	local atlasname   = removeUpDirectory( dir..t.atlasname )
+	local imagename   = removeUpDirectory( dir..t.imagename )
+	local image       = cachedImages[imagename] or love.graphics.newImage( imagename )
 	
-	cachedImages[imagepath] = image
+	cachedImages[imagename] = image
 	
-	local atlas      = l.loadAtlas(atlaspath)
+	local atlas      = l.loadAtlas(atlasname)
 	local maptype    = t.type
 	local mapNew     = maptype== 'orthogonal' and map.new or isomap.new
 	local mapobject  = mapNew(image,atlas,t.tw,t.th)
 	local maparray   = t.maparray
 	local maptilegrid= mapobject.tilegrid
 	
-	mapobject:setAtlasPath(t.atlaspath)
-	mapobject:setImagePath(t.imagepath)
+	mapobject:setAtlasName(t.atlasname)
+	mapobject:setImageName(t.imagename)
 	mapobject:setViewRange(1,1,maparray.width,maparray.height)
 	
 	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do
@@ -191,7 +191,7 @@ function l.saveDrawList(drawlist,path)
 	
 	for i,layer in pairs(drawlist.layers) do
 		local settings = drawlist.settings[layer]
-		local mapname  = settings.path or name..'_layer_'..i..DEFAULT_MAP_EXTENSION
+		local mapname  = layer.layername or name..'_layer_'..i..DEFAULT_MAP_EXTENSION
 		layers[i] = {
 			isDrawable  = settings.isDrawable,
 			xtransfactor= settings.xtransfactor,
@@ -224,12 +224,13 @@ function l.loadDrawList(path)
 		local newlayer
 		if layer.isDummy then
 			newlayer = {}
+			newlayer.layername = layer.path
 		else
 			local mappath = removeUpDirectory(dir..layer.path)
 			newlayer      = l.loadMap(mappath)
+			newlayer:setLayerName(layer.path)
 		end
 		dl:insert(newlayer,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
-		dl:setLayerPath(i,layer.path)
 	end
 	return dl
 end

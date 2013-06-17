@@ -72,8 +72,8 @@ local directions = {
 		if index == #layers then return end
 		layers[index+1],layers[index] = layers[index],layers[index+1]
 	end, 
-	front= function(layers,index) table.insert(layers,    table.remove(layers,index) ) end, 
-	back = function(layers,index) table.insert(layers, 1, table.remove(layers,index) ) end,  
+	top    = function(layers,index) table.insert(layers,    table.remove(layers,index) ) end, 
+	bottom = function(layers,index) table.insert(layers, 1, table.remove(layers,index) ) end,  
 }
 
 function t:move(name,direction)

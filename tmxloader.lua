@@ -354,7 +354,7 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	map.properties= layer.properties
 	map.opacity   = layer.opacity
 	map:setViewRange(1,1,tmxmap.width,tmxmap.height)
-	map:setAtlasName(tileset.name..'.atlas')
+	map:setAtlasName(tileset.name)
 	return tileset,map
 end
 
@@ -410,7 +410,7 @@ local worker = function(filename,chunkSize)
 						firstgid    = tileset.firstgid
 						
 						dl:insert(name,map,1,1,layer.visible ~= 0)
-						map:setLayerName(name..'.map')
+						map:setLayerName(name)
 					end
 					local index = gid-firstgid+1
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)

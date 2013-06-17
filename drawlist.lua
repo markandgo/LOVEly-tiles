@@ -45,8 +45,10 @@ function t:remove(name)
 	return the_layer
 end
 
-function t:removeAll()
-	self.layers = {}
+function t:clear()
+	self.layers   = {}
+	self.settings = {}
+	self.x,self.y = 0,0
 end
 
 function t:swap(name1,name2)
@@ -84,10 +86,6 @@ end
 
 function t:sort(func)
 	table.sort(self.layers,func)
-end
-
-function t:totalLayers()
-	return #self.layers
 end
 
 function t:setDrawable(name,bool)

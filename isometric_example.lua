@@ -30,7 +30,7 @@ xxxxx  xxxx   xxxx   xxxxx
 	map = isomap.new(sheet,sheetatlas,64,32)	
 	
 	for x,y,v in md.string(mapsource) do
-		if v == 'x' then map:setAtlasIndex(x,y,{5,4}) end
+		if v == 'x' then map:setTile(x,y,{5,4}) end
 	end
 	
 	--[[######################
@@ -39,7 +39,7 @@ xxxxx  xxxx   xxxx   xxxxx
 	
 	map:setFlip(1,1,true,false)
 	map:setAngle(5,1,3.14)
-	map:setAtlasIndex(3,1)
+	map:setTile(3,1)
 	
 	--[[######################
 	SET VIEWING RANGE: 100 X 100 TILES

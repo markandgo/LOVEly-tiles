@@ -40,7 +40,7 @@ function s:load()
 		elseif v == '@' then index = 2
 		elseif v == 'q' then index = 3
 		elseif v == 'x' then index = 4 end
-		map:setAtlasIndex(x,y,index)
+		map:setTile(x,y,index)
 	end
 	
 	--[[######################
@@ -55,7 +55,7 @@ function s:load()
 	
 	map:setFlip(1,1,true,false)
 	map:setAngle(2,1,3.14/2)
-	map:setAtlasIndex(3,1)
+	map:setTile(3,1)
 	
 	scroll_speed = 500
 	x,y = 0,0
@@ -76,12 +76,12 @@ function s:mousepressed(mx,my,b)
 	local x,y = mx-x,my-y
 	
 	if b == 'l' then
-		index = map:getAtlasIndex(math.ceil(x/16),math.ceil(y/16))
+		index = map:getTile(math.ceil(x/16),math.ceil(y/16))
 		local nexti = index and index+1 <= 4 and index+1 or 1
-		map:setAtlasIndex(math.ceil(x/16),math.ceil(y/16),nexti)
+		map:setTile(math.ceil(x/16),math.ceil(y/16),nexti)
 	end
 	
-	if b == 'r' then map:setAtlasIndex(math.ceil(x/16),math.ceil(y/16)) end
+	if b == 'r' then map:setTile(math.ceil(x/16),math.ceil(y/16)) end
 end
 
 function s:update(dt)

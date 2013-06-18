@@ -58,7 +58,7 @@ function s.save( tbl,filename )
 	local charS,charE = "\t","\n"
 	
 	local err = createSubDir(filename)
-	if err then return false,err end
+	if err then return nil,err end
 	
 	local file = love.filesystem.newFile(filename)
 	file:open('w')

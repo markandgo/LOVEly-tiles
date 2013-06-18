@@ -2,28 +2,6 @@ local path      = (...):match('^.+[%.\\/]') or ''
 local mapdata   = require(path..'mapdata')
 local map       = require(path..'map')
 local isomap    = require(path..'isomap')
-
--- ==============================================
--- PATH FUNCTIONS
--- ==============================================
-
-local function getPathComponents(path)
-	local dir,name,ext = path:match('^(.-)([^\\/]-)%.?([^\\/%.]*)$')
-	if #name == 0 then name = ext; ext = '' end
-	return dir,name,ext
-end
-
-local function removeUpDirectory(path)
-	while path:find('%.%.[\\/]+') do
-		path = path:gsub('[^\\/]*[\\/]*%.%.[\\/]+','')
-	end
-	return path
-end
-
-local stripExcessSlash = function(path)
-	return path:gsub('[\\/]+','/'):match('^/?(.*)')
-end
-
 -- ==============================================
 -- FORMAT PROPERTIES TABLE
 -- ==============================================
@@ -64,7 +42,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 		local iw,ih  = atlas:getImageSize()
 		local image  = {
 			__element= 'image',
-			source   = layer:getImagePath(),
+			source   = layer:getImageSource(),
 			width    = iw,
 			height   = ih,
 		}
@@ -95,11 +73,10 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 			y        = to.y
 		} 
 		
-		local _,name = getPathComponents(layer:getAtlasPath())
 		local tileset= {
 			__element = 'tileset',
 			firstgid  = firstgid,
-			name      = name or ('tileset '..i),
+			name      = layer.atlas:getName() or ('tileset '..(#tilesets+1)),
 			tilewidth = tw,
 			tileheight= th,
 			spacing   = atlas:getSpacings(), 
@@ -184,11 +161,10 @@ local makeAndInsertTileLayer = function(drawlist,i,layer,layers,atlasDone)
 	end
 	local formatteddata = {__element = 'data',encoding = 'csv'; table.concat(rows,',\n')}
 	
-	local _,name = getPathComponents(drawlist:getLayerPath(i))
 	local formattedlayer = {
 		__element= 'layer',
-		name     = name or ('layer '..i),
-		visible  = drawlist:isDrawable(i) and 1 or 0,
+		name     = layer:getName() or ('layer '..i),
+		visible  = drawlist:isDrawable(layer:getName()) and 1 or 0,
 		data     = formatteddata,
 		width    = data.width,
 		height   = data.height,
@@ -298,15 +274,14 @@ local function prepareTable(drawlist,path)
 		elseif layer.__element == 'objectgroup' then
 			makeAndInsertObjGroup(layer,layers)
 		elseif layer.__element == 'imagelayer' then
-			local _,name = getPathComponents(layer.imagepath)
 			local imagelayer  = {
 				__element= 'imagelayer',
-				name     = name,
+				name     = layer.name,
 				width    = layer.width,
 				height   = layer.height,
 				{
 					__element= 'image',
-					source   = layer.imagepath,
+					source   = layer.source,
 					trans    = layer.trans,
 				},
 				prepareTableProperties(layer.properties),

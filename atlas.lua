@@ -70,6 +70,7 @@ function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,at
 	self.xs,self.ys= xs,ys
 	self.iWidth    = imageWidth
 	self.iHeight   = imageHeight
+	self.atlasname = nil
 	
 	for gx = 1,dx do 
 		for gy = 1,dy do
@@ -121,8 +122,38 @@ function atlas:getProperty(index)
 	return grid.get(self,indexToCoord(self,index)).property
 end
 
+function atlas:setName(atlasname)
+	self.atlasname = atlasname
+end
+
+function atlas:getName()
+	return self.atlasname
+end
+
 function atlas:draw(image,index,...)
 	drawq(image,getq(self,index),...)
+end
+
+-- ####################################
+-- TMX RELATED FUNCTIONS
+-- ####################################
+
+function atlas:getTileOffsets()
+	local to = self.atlas.tileoffset
+	return to.x,to.y
+end
+
+function atlas:setTileOffsets(x,y)
+	local to = self.atlas.tileoffset
+	to.x,to.y= x,y
+end
+
+function atlas:getTilesetProperty(name)
+	return self.properties[name]
+end
+
+function atlas:setTilesetProperty(name,value)
+	self.properties[name] = value
 end
 
 return atlas

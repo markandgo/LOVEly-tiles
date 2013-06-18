@@ -63,6 +63,7 @@ function l.saveAtlas(atlas,path)
 		xs        = atlas.xs,
 		ys        = atlas.ys,
 		properties= grid.new(),
+		atlasname = atlas.atlasname,
 	}
 	for x,y,v in grid.iterate(atlas) do
 		if v.property then
@@ -89,21 +90,27 @@ function l.loadAtlas(path)
 end
 
 function l.saveMap(map,path)
-	if not map.imagepath then return 'Must specify a relative image path (map.imagepath)!' end
+	if not map.imagesource then 
+		return nil,'Must specify a source image!' 
+	end
 	
 	path              = stripExcessSlash(path)
 	local class       = getmetatable(map)
 	local dir,name,ext= getPathComponents(path)
 	
-	if not love.filesystem.exists( removeUpDirectory(dir..map.imagepath) ) then return 'File does not exist for image path!' end
+	if not love.filesystem.exists( removeUpDirectory(dir..map.imagesource) ) then 
+		return nil,'File does not exist for image path!' 
+	end
 	
 	local t = {
-		tw       = map.tw,
-		th       = map.th,
-		imagepath= map.imagepath,
-		atlaspath= map.atlaspath or name..DEFAULT_ATLAS_EXTENSION,
-		maparray = map:export(1),
-		type     = class == isomap and 'isometric' or 'orthogonal'
+		tw         = map.tw,
+		th         = map.th,
+		imagesource= map.imagesource,
+		atlasname  = map.atlas.name or name,
+		layername  = map.layername,
+		maparray   = map:export(1),
+		viewrange  = {map:getViewRange()},
+		type       = class== isomap and 'isometric' or 'orthogonal'
 	}
 	
 	local grid  = map.tilegrid
@@ -136,10 +143,10 @@ function l.saveMap(map,path)
 	end
 	
 	local _,err = serialize.save(t,path)
-	if err then return false,err end
+	if err then return nil,err end
 	
-	local fullatlaspath = removeUpDirectory(dir..t.atlaspath)
-	return l.saveAtlas(map.atlas,fullatlaspath)
+	local atlaspath = removeUpDirectory(dir..t.atlasname..DEFAULT_ATLAS_EXTENSION)
+	return l.saveAtlas(map.atlas,atlaspath)
 end
 
 function l.loadMap(path)
@@ -149,29 +156,29 @@ function l.loadMap(path)
 	
 	if not t then return nil,'No file was found for the specified path' end
 	
-	local atlaspath   = removeUpDirectory( dir..t.atlaspath )
-	local imagepath   = removeUpDirectory( dir..t.imagepath )
-	local image       = cachedImages[imagepath] or love.graphics.newImage( imagepath )
+	local imagesource = removeUpDirectory( dir..t.imagesource )
+	local image       = cachedImages[imagesource] or love.graphics.newImage( imagesource )
 	
-	cachedImages[imagepath] = image
+	cachedImages[imagesource] = image
 	
-	local atlas      = l.loadAtlas(atlaspath)
+	local atlas      = l.loadAtlas(t.atlasname..DEFAULT_ATLAS_EXTENSION)
 	local maptype    = t.type
 	local mapNew     = maptype== 'orthogonal' and map.new or isomap.new
 	local mapobject  = mapNew(image,atlas,t.tw,t.th)
 	local maparray   = t.maparray
 	local maptilegrid= mapobject.tilegrid
 	
-	mapobject:setAtlasPath(t.atlaspath)
-	mapobject:setImagePath(t.imagepath)
+	mapobject:setImageSource(t.imagesource)
 	mapobject:setViewRange(1,1,maparray.width,maparray.height)
+	mapobject:setName(t.layername)
+	mapobject:setViewRange(unpack(t.viewrange))
 	
 	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do
 		local isIndex = type(v) == 'number'
 		if isIndex then
-			if v > 0 then mapobject:setAtlasIndex(x,y,v) end
+			if v > 0 then mapobject:setTile(x,y,v) end
 		else
-			mapobject:setAtlasIndex(x,y,v.index)
+			mapobject:setTile(x,y,v.index)
 			local mv   = maptilegrid(x,y)
 			mv.sx,mv.sy= v.sx or 1,v.sy or 1
 			mv.angle   = v.angle or 0
@@ -191,17 +198,17 @@ function l.saveDrawList(drawlist,path)
 	
 	for i,layer in pairs(drawlist.layers) do
 		local settings = drawlist.settings[layer]
-		local mapname  = settings.path or name..'_layer_'..i..DEFAULT_MAP_EXTENSION
+		local layername= layer.layername or name..'_layer_'..i
 		layers[i] = {
 			isDrawable  = settings.isDrawable,
 			xtransfactor= settings.xtransfactor,
 			ytransfactor= settings.ytransfactor,
-			path        = mapname,
+			layername   = layername,
 			isDummy     = nil,
 		}
 		local class    = getmetatable(layer)
 		if class == map or class == isomap then
-			local mappath = removeUpDirectory(dir..mapname)
+			local mappath = removeUpDirectory(dir..layername..DEFAULT_MAP_EXTENSION)
 			l.saveMap(layer,mappath)
 		else
 			layers[i].isDummy = true
@@ -223,13 +230,13 @@ function l.loadDrawList(path)
 	for i,layer in ipairs(t.layers) do
 		local newlayer
 		if layer.isDummy then
-			newlayer = {}
+			newlayer           = {}
+			newlayer.layername = layer.layername
 		else
-			local mappath = removeUpDirectory(dir..layer.path)
+			local mappath = removeUpDirectory(dir..layer.layername..DEFAULT_MAP_EXTENSION)
 			newlayer      = l.loadMap(mappath)
 		end
-		dl:insert(newlayer,i,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
-		dl:setLayerPath(i,layer.path)
+		dl:insert(newlayer.layername or layer.layername,newlayer,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
 	end
 	return dl
 end

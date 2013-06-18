@@ -62,7 +62,7 @@ end
 
 local map   = setmetatable({},{__call = function(self,...) return self.new(...) end})
 map.__index = map
-map.__call  = function(self,tx,ty) return map.getAtlasIndex(self,tx,ty) end
+map.__call  = function(self,tx,ty) return map.getTile(self,tx,ty) end
 
 function map.new(image,atlas, tw,th)
 	local self   = grid.new()
@@ -76,22 +76,24 @@ function map.new(image,atlas, tw,th)
 	self.SBwidth = qcols
 	self.SBheight= qrows
 	
-	self.tilegrid = grid.new()
-	self.image    = image
-	self.imagepath= nil
-	self.atlaspath= nil
-	self.viewrange={1,1,0,0}
-	self.quads    = setmetatable({},{__mode= 'kv'})
-	self.atlas    = atlas
-	self.hw       = qw/2
-	self.hh       = qh/2
-	self.tw       = tw
-	self.th       = th
+	self.tilegrid   = grid.new()
+	self.image      = image
+	self.imagesource= nil
+	self.layername  = nil
+	self.viewrange  ={1,1,0,0}
+	self.sbrange    = {1,1,0,0}
+	self.quads      = setmetatable({},{__mode= 'kv'})
+	self.atlas      = atlas
+	self.hw         = qw/2
+	self.hh         = qh/2
+	self.tw         = tw
+	self.th         = th
 	
 	return setmetatable(self,map)
 end
 
 function map:export(dimension,reverse)
+	dimension = dimension or 1
 	assert(dimension == 1 or dimension == 2,'Expected 1 or 2 as dimension argument.')
 	
 	local array
@@ -128,7 +130,7 @@ function map:export(dimension,reverse)
 	return array
 end
 
-function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)
+function map:setTile(tx,ty,index,  angle,flipx,flipy)
 	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
@@ -159,7 +161,7 @@ function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)
 	setQuad(self,t)
 end
 
-function map:getAtlasIndex(tx,ty)
+function map:getTile(tx,ty)
 	local t = grid.get(self.tilegrid,tx,ty)
 	return t and t.index
 end
@@ -168,24 +170,24 @@ function map:getAtlas()
 	return self.atlas
 end
 
-function map:setAtlasPath(atlaspath)
-	self.atlaspath = atlaspath
+function map:setName(layername)
+	self.layername = layername
 end
 
-function map:getAtlasPath()
-	return self.atlaspath
+function map:getName()
+	return self.layername
 end
 
 function map:getTileSize()
 	return self.tw,self.th
 end
 
-function map:setImagePath(imagepath)
-	self.imagepath = imagepath
+function map:setImageSource(source)
+	self.imagesource = source
 end
 
-function map:getImagePath()
-	return self.imagepath
+function map:getImageSource()
+	return self.imagesource
 end
 
 function map:setImage(image)
@@ -234,15 +236,41 @@ end
 
 function map:setViewRange(tx,ty,tx2,ty2)
 	local vr               = self.viewrange
-	vr[1],vr[2],vr[3],vr[4]= getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
+	vr[1],vr[2],vr[3],vr[4]= tx,ty,tx2,ty2
+	local sr               = self.sbrange
+	sr[1],sr[2],sr[3],sr[4]= getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
+end
+
+function map:getViewRange()
+	return unpack(self.viewrange)
 end
 
 function map:draw(...)
-	local vr               = self.viewrange
-	local sbx,sby,sbx2,sby2= vr[1],vr[2],vr[3],vr[4]
+	local sr               = self.viewrange
+	local sbx,sby,sbx2,sby2= sr[1],sr[2],sr[3],sr[4]
 	for sbx,sby,sb in grid.rectangle(self,sbx,sby,sbx2,sby2,true) do
 		lg.draw(sb, ...)
 	end
+end
+
+-- ####################################
+-- TMX RELATED FUNCTIONS
+-- ####################################
+
+function map:getOpacity()
+	return self.opacity
+end
+
+function map:setOpacity(opacity)
+	self.opacity = opacity
+end
+
+function map:getLayerProperty(name)
+	return self.properties[name]
+end
+
+function map:setLayerProperty(name,value)
+	self.properties[name] = value
 end
 
 return map

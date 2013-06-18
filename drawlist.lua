@@ -1,85 +1,100 @@
-local __settings = {__index = function(t,k) rawset(t,k,{}) return t[k] end,__mode= 'k'}
+local getIndex = function(self,the_layer)
+	for i,layer in ipairs(self.layers) do
+		if layer == the_layer then return i end
+	end
+end
 
 local t   = setmetatable({},{__call = function(self,...) return self.new(...) end})
-t.__call  = function(self,i) return self.layers[i] end
+t.__call  = function(self,name) return self:getLayer(name) end
 t.__index = t
 
 function t.new()
 	local d = {
 		layers   = {},
-		settings = setmetatable({},__settings),
+		settings = {},
 		x        = 0,
 		y        = 0,
 	}
 	return setmetatable(d,t)
 end
 
-function t:setLayerPath(i,path)
-	local layer = self.layers[i]
-	self.settings[layer].path = path
+function t:getLayer(name)
+	return self.settings[name] and self.settings[name].layer
 end
 
-function t:getLayerPath(i)
-	local layer = self.layers[i]
-	return self.settings[layer].path
-end
-
-function t:getLayer(i)
-	return self.layers[i]
-end
-
-function t:insert(layer,i,xtransfactor,ytransfactor,isDrawable)
-	i           = i or #self.layers+1
+function t:insert(name,layer,xtransfactor,ytransfactor,isDrawable)
 	xtransfactor= xtransfactor or 1
 	ytransfactor= ytransfactor or xtransfactor
-	table.insert(self.layers,i,layer)
-	local t        = self.settings[layer]
+	table.insert(self.layers,layer)
+	local t        = self.settings[name] or {}
+	self.settings[name]  = t
+	self.settings[layer] = t
 	t.isDrawable   = isDrawable == nil and true or isDrawable
 	t.xtransfactor = xtransfactor
 	t.ytransfactor = ytransfactor
+	t.layer        = layer
 end
 
-function t:remove(i)
-	return table.remove(self.layers,i)
+function t:remove(name)
+	local the_layer = self:getLayer(name)
+	for i,layer in ipairs(self.layers) do
+		if layer == the_layer then table.remove(self.layers,i) break end
+	end
+	self.settings[name]      = nil
+	self.settings[the_layer] = nil
+	return the_layer
 end
 
-function t:removeAll()
-	self.layers = {}
+function t:clear()
+	self.layers   = {}
+	self.settings = {}
+	self.x,self.y = 0,0
 end
 
-function t:swap(i,i2)
-	assert(self.layers[i] and self.layers[i2],'Cannot swap empty layer(s)!')
-	self.layers[i],self.layers[i2] = self.layers[i2],self.layers[i]
+function t:swap(name1,name2)
+	local layer1 = self:getLayer(name1)
+	local layer2 = self:getLayer(name2)
+	local i1,i2
+	for i,layer in ipairs(self.layers) do
+		if layer == layer1 then i1 = i end
+		if layer == layer2 then i2 = i end
+		if i1 and i2 then 
+			break
+		end
+	end
+	self.layers[i1],self.layers[i2] = layer2,layer1
 end
 
 local directions = {
-	down = function(index,layers) layers[index-1],layers[index] = layers[index],layers[index-1] end, 
-	up   = function(index,layers) layers[index+1],layers[index] = layers[index],layers[index+1] end, 
-	front= function(index,layers) table.insert(layers, table.remove(layers,index) )             end, 
-	back = function(index,layers) table.insert(layers, 1, table.remove(layers,index) )          end,  
+	down = function(layers,index) 
+		if index < 1 then return end 
+		layers[index-1],layers[index] = layers[index],layers[index-1]
+	end, 
+	up   = function(layers,index) 
+		if index == #layers then return end
+		layers[index+1],layers[index] = layers[index],layers[index+1]
+	end, 
+	top    = function(layers,index) table.insert(layers,    table.remove(layers,index) ) end, 
+	bottom = function(layers,index) table.insert(layers, 1, table.remove(layers,index) ) end,  
 }
 
-function t:move(i,direction)
-	assert(i > 0,'layer index cannot be less than 1')
+function t:move(name,direction)
 	assert(directions[direction],'Invalid direction')
-	directions[direction](i,self.layers)
+	local index = getIndex(self:getLayer(name))
+	directions[direction](self.layers,index)
 end
 
 function t:sort(func)
 	table.sort(self.layers,func)
 end
 
-function t:totalLayers()
-	return #self.layers
-end
-
-function t:setDrawable(i,bool)
+function t:setDrawable(name,bool)
 	if bool == nil then error('expected true or false for drawable') end
-	self.settings[self.layers[i]].isDrawable = bool
+	self.settings[name].isDrawable = bool
 end
 
-function t:isDrawable(i)
-	return self.settings[self.layers[i]].isDrawable
+function t:isDrawable(name)
+	return self.settings[name].isDrawable
 end
 
 function t:translate(dx,dy)
@@ -94,13 +109,13 @@ function t:getTranslation()
 	return self.x,self.y
 end
 
-function t:setTransFactors(i,xfactor,yfactor)
-	self.settings[self.layers[i]].xtransfactor = xfactor
-	self.settings[self.layers[i]].ytransfactor = yfactor or xfactor
+function t:setTransFactors(name,xfactor,yfactor)
+	self.settings[name].xtransfactor = xfactor
+	self.settings[name].ytransfactor = yfactor or xfactor
 end
 
-function t:getTransFactors(i)
-	return self.settings[self.layers[i]].xtransfactor, self.settings[self.layers[i]].ytransfactor
+function t:getTransFactors(name)
+	return self.settings[name].xtransfactor, self.settings[name].ytransfactor
 end
 
 function t:iterate()
@@ -127,6 +142,14 @@ function t:draw(...)
 		end
 		love.graphics.pop()
 	end
+end
+
+-- ####################################
+-- TMX RELATED FUNCTIONS
+-- ####################################
+
+function t:getAtlas(name)
+	return self.atlases[name]
 end
 
 return t

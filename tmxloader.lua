@@ -41,49 +41,6 @@ local function applyTmxStyleToDraw(map)
 	end
 end
 
--- new methods
-function atlas:getTileOffsets()
-	local to = self.atlas.tileoffset
-	return to.x,to.y
-end
-
-function atlas:setTileOffsets(x,y)
-	local to = self.atlas.tileoffset
-	to.x,to.y= x,y
-end
-
-function atlas:getTilesetProperty(name)
-	return self.properties[name]
-end
-
-function atlas:setTilesetProperty(name,value)
-	self.properties[name] = value
-end
-
-function map:getOpacity()
-	return self.opacity
-end
-
-function map:setOpacity(opacity)
-	self.opacity = opacity
-end
-
-function map:getLayerProperty(name)
-	return self.properties[name]
-end
-
-function map:setLayerProperty(name,value)
-	self.properties[name] = value
-end
-
-function drawlist:getLayerName(name)
-	return self.layernames[name]
-end
-
-function drawlist:getAtlas(name)
-	return self.atlases[name]
-end
-
 -- ==============================================
 -- XML HANDLER LOGIC
 -- ==============================================
@@ -319,13 +276,12 @@ end
 
 local function buildImage(tmxmap,parent)
 	local imagetable= parent.image
-	local imagepath = stripExcessSlash(  removeUpDirectory(tmxmap.path..imagetable.source)  )
-	local image     = imageCache[imagepath] or love.graphics.newImage(imagepath)
+	local source    = stripExcessSlash(  removeUpDirectory(tmxmap.path..imagetable.source)  )
+	local image     = imageCache[source] or love.graphics.newImage(source)
 	imageCache[path]= image
 	parent.image    = image
-	parent.imagepath= imagetable.source
+	parent.source   = imagetable.source
 	parent.trans    = imagetable.trans
-	parent.__element= 'imagelayer'
 end
 
 local function mergeExternalTSX(tmxmap,tileset)
@@ -359,6 +315,7 @@ local function buildAtlasesAndImages(tmxmap)
 		atlas.properties= tileset.properties
 		-- hack for tileoffset
 		atlas.tileoffset= tileset.tileoffset
+		atlas:setName(tileset.name)
 		tileset.atlas   = atlas
 		
 		
@@ -381,7 +338,7 @@ local function storeAtlasesByName(tmxmap,dl)
 	end
 end
 
-local function getTilesetAndMap(gid,tmxmap,layer)
+local function getTilesetBuildMap(gid,tmxmap,layer)
 	local tilesets = tmxmap.tilesets
 	local mapnew   = tmxmap.orientation == 'orthogonal' and map.new or tmxmap.orientation == 'isometric' and isomap.new
 	local chosen
@@ -390,22 +347,14 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 			chosen = tileset
 		end
 	end
-	local tileset = chosen
-	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
+	local tileset  = chosen
+	local map      = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
 	applyTmxStyleToDraw(map)
-	map.imagepath = tileset.imagepath
-	map.properties= layer.properties
-	map.opacity   = layer.opacity
+	map.imagesource= tileset.source
+	map.properties = layer.properties
+	map.opacity    = layer.opacity
 	map:setViewRange(1,1,tmxmap.width,tmxmap.height)
-	map:setAtlasPath(tileset.name..'.atlas')
 	return tileset,map
-end
-
-local function storeLayersByName(tmxmap,dl)
-	dl.layernames = {}
-	for i,layer in pairs(tmxmap.layers) do
-		dl.layernames[layer.name] = layer
-	end
 end
 
 local tmxToTable = function(filename)
@@ -449,14 +398,14 @@ local worker = function(filename,chunkSize)
 			for gid,x,y,angle,flipx,flipy in streamData(tmxmap,layer) do
 				if gid ~= 0 then
 					if not (tileset and map) then
-						tileset,map = getTilesetAndMap(gid,tmxmap,layer)
+						tileset,map = getTilesetBuildMap(gid,tmxmap,layer)
 						firstgid    = tileset.firstgid
 						
-						dl:insert(map,nil,1,1,layer.visible ~= 0)
-						dl:setLayerPath(dl:totalLayers(),name..'.map')
+						dl:insert(name,map,1,1,layer.visible ~= 0)
+						map:setName(name)
 					end
 					local index = gid-firstgid+1
-					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
+					map:setTile(x,y,index,angle,flipx,flipy)
 				end
 				chunkCount = chunkCount + 1
 				if chunkSize and chunkCount == chunkSize then 
@@ -465,8 +414,11 @@ local worker = function(filename,chunkSize)
 				end
 			end
 		else
-			if layer.image then buildImage(tmxmap,layer) else layer.__element = 'objectgroup' end
-			dl:insert(layer)
+			if layer.image then 
+				buildImage(tmxmap,layer) 
+				layer.__element = 'imagelayer'
+			else layer.__element = 'objectgroup' end
+			dl:insert(layer.name,layer)
 			chunkCount = chunkCount + 1
 		end
 		
@@ -475,7 +427,6 @@ local worker = function(filename,chunkSize)
 			coroutine.yield() 
 		end
 	end
-	storeLayersByName(tmxmap,dl)
 	
 	if not chunkSize then return dl end
 end

@@ -354,7 +354,7 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	map.properties= layer.properties
 	map.opacity   = layer.opacity
 	map:setViewRange(1,1,tmxmap.width,tmxmap.height)
-	map:setAtlasName(tileset.name)
+	map.atlas:setAtlasName(tileset.name)
 	return tileset,map
 end
 

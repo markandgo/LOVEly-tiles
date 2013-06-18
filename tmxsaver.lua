@@ -95,7 +95,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 			y        = to.y
 		} 
 		
-		local _,name = getPathComponents(layer:getAtlasName())
+		local _,name = getPathComponents(layer.atlas:getAtlasName())
 		local tileset= {
 			__element = 'tileset',
 			firstgid  = firstgid,

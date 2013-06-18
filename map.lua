@@ -79,7 +79,6 @@ function map.new(image,atlas, tw,th)
 	self.tilegrid = grid.new()
 	self.image    = image
 	self.imagename= nil
-	self.atlasname= nil
 	self.layername= nil
 	self.viewrange={1,1,0,0}
 	self.quads    = setmetatable({},{__mode= 'kv'})
@@ -176,14 +175,6 @@ end
 
 function map:getLayerName()
 	return self.layername
-end
-
-function map:setAtlasName(atlasname)
-	self.atlasname = atlasname
-end
-
-function map:getAtlasName()
-	return self.atlasname
 end
 
 function map:getTileSize()

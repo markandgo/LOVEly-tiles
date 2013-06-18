@@ -70,6 +70,7 @@ function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,at
 	self.xs,self.ys= xs,ys
 	self.iWidth    = imageWidth
 	self.iHeight   = imageHeight
+	self.atlasname = nil
 	
 	for gx = 1,dx do 
 		for gy = 1,dy do
@@ -119,6 +120,14 @@ end
 
 function atlas:getProperty(index)
 	return grid.get(self,indexToCoord(self,index)).property
+end
+
+function atlas:setAtlasName(atlasname)
+	self.atlasname = atlasname
+end
+
+function atlas:getAtlasName()
+	return self.atlasname
 end
 
 function atlas:draw(image,index,...)

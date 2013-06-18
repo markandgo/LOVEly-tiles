@@ -63,6 +63,7 @@ function l.saveAtlas(atlas,path)
 		xs        = atlas.xs,
 		ys        = atlas.ys,
 		properties= grid.new(),
+		atlasname = atlas.atlasname,
 	}
 	for x,y,v in grid.iterate(atlas) do
 		if v.property then
@@ -101,7 +102,7 @@ function l.saveMap(map,path)
 		tw       = map.tw,
 		th       = map.th,
 		imagename= map.imagename,
-		atlasname= map.atlasname or name..DEFAULT_ATLAS_EXTENSION,
+		atlasname= map.atlas.name or name..DEFAULT_ATLAS_EXTENSION,
 		maparray = map:export(1),
 		type     = class == isomap and 'isometric' or 'orthogonal'
 	}
@@ -162,7 +163,7 @@ function l.loadMap(path)
 	local maparray   = t.maparray
 	local maptilegrid= mapobject.tilegrid
 	
-	mapobject:setAtlasName(t.atlasname)
+	atlas:setAtlasName(t.atlasname)
 	mapobject:setImageName(t.imagename)
 	mapobject:setViewRange(1,1,maparray.width,maparray.height)
 	

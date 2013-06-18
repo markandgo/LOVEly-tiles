@@ -405,7 +405,7 @@ local worker = function(filename,chunkSize)
 						map:setName(name)
 					end
 					local index = gid-firstgid+1
-					map:setAtlasIndex(x,y,index,angle,flipx,flipy)
+					map:setTile(x,y,index,angle,flipx,flipy)
 				end
 				chunkCount = chunkCount + 1
 				if chunkSize and chunkCount == chunkSize then 

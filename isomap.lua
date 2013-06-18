@@ -78,7 +78,7 @@ function isomap.new(image,atlas, tw,th)
 	return setmetatable(self,isomap)
 end
 
-function isomap:setAtlasIndex(tx,ty,index, angle,flipx,flipy)
+function isomap:setTile(tx,ty,index, angle,flipx,flipy)
 	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then

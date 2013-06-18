@@ -176,9 +176,9 @@ function l.loadMap(path)
 	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do
 		local isIndex = type(v) == 'number'
 		if isIndex then
-			if v > 0 then mapobject:setAtlasIndex(x,y,v) end
+			if v > 0 then mapobject:setTile(x,y,v) end
 		else
-			mapobject:setAtlasIndex(x,y,v.index)
+			mapobject:setTile(x,y,v.index)
 			local mv   = maptilegrid(x,y)
 			mv.sx,mv.sy= v.sx or 1,v.sy or 1
 			mv.angle   = v.angle or 0

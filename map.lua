@@ -62,7 +62,7 @@ end
 
 local map   = setmetatable({},{__call = function(self,...) return self.new(...) end})
 map.__index = map
-map.__call  = function(self,tx,ty) return map.getAtlasIndex(self,tx,ty) end
+map.__call  = function(self,tx,ty) return map.getTile(self,tx,ty) end
 
 function map.new(image,atlas, tw,th)
 	local self   = grid.new()
@@ -130,7 +130,7 @@ function map:export(dimension,reverse)
 	return array
 end
 
-function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)
+function map:setTile(tx,ty,index,  angle,flipx,flipy)
 	local t = grid.get(self.tilegrid,tx,ty)
 	
 	if not t then
@@ -161,7 +161,7 @@ function map:setAtlasIndex(tx,ty,index,  angle,flipx,flipy)
 	setQuad(self,t)
 end
 
-function map:getAtlasIndex(tx,ty)
+function map:getTile(tx,ty)
 	local t = grid.get(self.tilegrid,tx,ty)
 	return t and t.index
 end

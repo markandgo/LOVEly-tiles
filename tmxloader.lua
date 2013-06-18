@@ -283,6 +283,7 @@ local function buildImage(tmxmap,parent)
 	parent.imagename= imagetable.source
 	parent.trans    = imagetable.trans
 	parent.__element= 'imagelayer'
+	parent.name     = imagetable.name
 end
 
 local function mergeExternalTSX(tmxmap,tileset)
@@ -316,6 +317,7 @@ local function buildAtlasesAndImages(tmxmap)
 		atlas.properties= tileset.properties
 		-- hack for tileoffset
 		atlas.tileoffset= tileset.tileoffset
+		atlas:setAtlasName(tileset.name)
 		tileset.atlas   = atlas
 		
 		
@@ -354,7 +356,6 @@ local function getTilesetAndMap(gid,tmxmap,layer)
 	map.properties= layer.properties
 	map.opacity   = layer.opacity
 	map:setViewRange(1,1,tmxmap.width,tmxmap.height)
-	map.atlas:setAtlasName(tileset.name)
 	return tileset,map
 end
 

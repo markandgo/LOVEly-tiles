@@ -300,10 +300,9 @@ local function prepareTable(drawlist,path)
 		elseif layer.__element == 'objectgroup' then
 			makeAndInsertObjGroup(layer,layers)
 		elseif layer.__element == 'imagelayer' then
-			local _,name = getPathComponents(layer.imagename)
 			local imagelayer  = {
 				__element= 'imagelayer',
-				name     = name,
+				name     = layer.name,
 				width    = layer.width,
 				height   = layer.height,
 				{

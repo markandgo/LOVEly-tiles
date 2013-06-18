@@ -81,6 +81,7 @@ function map.new(image,atlas, tw,th)
 	self.imagesource= nil
 	self.layername  = nil
 	self.viewrange  ={1,1,0,0}
+	self.sbrange    = {1,1,0,0}
 	self.quads      = setmetatable({},{__mode= 'kv'})
 	self.atlas      = atlas
 	self.hw         = qw/2
@@ -235,12 +236,18 @@ end
 
 function map:setViewRange(tx,ty,tx2,ty2)
 	local vr               = self.viewrange
-	vr[1],vr[2],vr[3],vr[4]= getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
+	vr[1],vr[2],vr[3],vr[4]= tx,ty,tx2,ty2
+	local sr               = self.sbrange
+	sr[1],sr[2],sr[3],sr[4]= getSBrange(tx,ty,tx2,ty2,self.SBwidth,self.SBheight)
+end
+
+function map:getViewRange()
+	return unpack(self.viewrange)
 end
 
 function map:draw(...)
-	local vr               = self.viewrange
-	local sbx,sby,sbx2,sby2= vr[1],vr[2],vr[3],vr[4]
+	local sr               = self.viewrange
+	local sbx,sby,sbx2,sby2= sr[1],sr[2],sr[3],sr[4]
 	for sbx,sby,sb in grid.rectangle(self,sbx,sby,sbx2,sby2,true) do
 		lg.draw(sb, ...)
 	end

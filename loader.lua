@@ -109,6 +109,7 @@ function l.saveMap(map,path)
 		atlasname  = map.atlas.name or name,
 		layername  = map.layername,
 		maparray   = map:export(1),
+		viewrange  = {map:getViewRange()},
 		type       = class== isomap and 'isometric' or 'orthogonal'
 	}
 	
@@ -170,6 +171,7 @@ function l.loadMap(path)
 	mapobject:setImageSource(t.imagesource)
 	mapobject:setViewRange(1,1,maparray.width,maparray.height)
 	mapobject:setLayerName(t.layername)
+	mapobject:setViewRange(unpack(t.viewrange))
 	
 	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do
 		local isIndex = type(v) == 'number'

@@ -282,7 +282,6 @@ local function buildImage(tmxmap,parent)
 	parent.image    = image
 	parent.source   = imagetable.source
 	parent.trans    = imagetable.trans
-	parent.imagename= imagetable.name
 end
 
 local function mergeExternalTSX(tmxmap,tileset)

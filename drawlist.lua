@@ -152,4 +152,12 @@ function t:getAtlas(name)
 	return self.atlases[name]
 end
 
+function t:setMapProperty(name,value)
+	self.properties[name] = value
+end
+
+function t:getMapProperty(name)
+	return self.properties[name]
+end
+
 return t

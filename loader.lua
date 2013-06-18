@@ -84,7 +84,7 @@ function l.loadAtlas(path)
 	local coords    = {}
 	for x,y,v in grid.iterate(t.properties) do
 		coords[1],coords[2] = x,y
-		atlas:setProperty(coords,v)
+		atlas:setqProperty(coords,v)
 	end
 	return atlas
 end

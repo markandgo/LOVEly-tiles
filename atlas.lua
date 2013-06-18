@@ -114,11 +114,11 @@ function atlas:getqViewport(index)
 	return x,y,atlas.getqSize(self)
 end
 
-function atlas:setProperty(index,value)
+function atlas:setqProperty(index,value)
 	grid.get(self,indexToCoord(self,index)).property = value
 end
 
-function atlas:getProperty(index)
+function atlas:getqProperty(index)
 	return grid.get(self,indexToCoord(self,index)).property
 end
 

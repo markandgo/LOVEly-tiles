@@ -325,7 +325,7 @@ local function buildAtlasesAndImages(tmxmap)
 				for key,value in pairs(tile.properties) do
 					properties[key] = value
 				end
-				atlas:setProperty(tile.id+1,properties)
+				atlas:setqProperty(tile.id+1,properties)
 			end
 		end		
 	end

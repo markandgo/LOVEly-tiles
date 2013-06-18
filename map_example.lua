@@ -5,7 +5,12 @@ function s:load()
 	atlas   = require 'lib.atlas'
 	map     = require 'lib.map'
 	mapdata = require 'lib.mapdata'
-
+	load    = (require 'lib.loader').loadMap
+	save    = (require 'lib.loader').saveMap
+	
+	local newmap,err = load 'map_example.map'
+	if newmap then map = newmap return end
+	
 	sheet = gr.newImage('tile.png')
 	sheet:setFilter('linear','nearest')
 	
@@ -54,10 +59,13 @@ function s:load()
 	
 	scroll_speed = 500
 	x,y = 0,0
+	
+	map:setImageSource 'tile.png'
 end
 
 function s:keypressed(k)
 	if k == ' ' then state = require 'isometric_example' state:load() end
+	if k == '1' then ok,err = save(map,'map_example.map') assert(not err and ok,err) end
 end
 
 function s:mousepressed(mx,my,b)
@@ -99,6 +107,7 @@ function s:draw()
 		map:draw()	
 	gr.pop()
 	
+	gr.print('Press 1 to save',0,564)
 	gr.print('Right mouse click to erase a tile',0,576)
 	gr.print('Left mouse click to add/change a tile',0,588)
 end

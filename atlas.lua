@@ -122,11 +122,11 @@ function atlas:getProperty(index)
 	return grid.get(self,indexToCoord(self,index)).property
 end
 
-function atlas:setAtlasName(atlasname)
+function atlas:setName(atlasname)
 	self.atlasname = atlasname
 end
 
-function atlas:getAtlasName()
+function atlas:getName()
 	return self.atlasname
 end
 

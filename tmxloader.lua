@@ -315,7 +315,7 @@ local function buildAtlasesAndImages(tmxmap)
 		atlas.properties= tileset.properties
 		-- hack for tileoffset
 		atlas.tileoffset= tileset.tileoffset
-		atlas:setAtlasName(tileset.name)
+		atlas:setName(tileset.name)
 		tileset.atlas   = atlas
 		
 		
@@ -402,7 +402,7 @@ local worker = function(filename,chunkSize)
 						firstgid    = tileset.firstgid
 						
 						dl:insert(name,map,1,1,layer.visible ~= 0)
-						map:setLayerName(name)
+						map:setName(name)
 					end
 					local index = gid-firstgid+1
 					map:setAtlasIndex(x,y,index,angle,flipx,flipy)

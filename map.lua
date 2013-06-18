@@ -170,11 +170,11 @@ function map:getAtlas()
 	return self.atlas
 end
 
-function map:setLayerName(layername)
+function map:setName(layername)
 	self.layername = layername
 end
 
-function map:getLayerName()
+function map:getName()
 	return self.layername
 end
 

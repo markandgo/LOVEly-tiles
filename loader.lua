@@ -170,7 +170,7 @@ function l.loadMap(path)
 	
 	mapobject:setImageSource(t.imagesource)
 	mapobject:setViewRange(1,1,maparray.width,maparray.height)
-	mapobject:setLayerName(t.layername)
+	mapobject:setName(t.layername)
 	mapobject:setViewRange(unpack(t.viewrange))
 	
 	for x,y,v in mapdata.array(maparray,maparray.width,maparray.height) do

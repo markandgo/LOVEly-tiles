@@ -90,13 +90,17 @@ function l.loadAtlas(path)
 end
 
 function l.saveMap(map,path)
-	if not map.imagename then return 'Must specify a relative image path (map.imagename)!' end
+	if not map.imagename then 
+		return nil,'Must specify a relative image path (map.imagename)!' 
+	end
 	
 	path              = stripExcessSlash(path)
 	local class       = getmetatable(map)
 	local dir,name,ext= getPathComponents(path)
 	
-	if not love.filesystem.exists( removeUpDirectory(dir..map.imagename) ) then return 'File does not exist for image path!' end
+	if not love.filesystem.exists( removeUpDirectory(dir..map.imagename) ) then 
+		return nil,'File does not exist for image path!' 
+	end
 	
 	local t = {
 		tw       = map.tw,
@@ -138,7 +142,7 @@ function l.saveMap(map,path)
 	end
 	
 	local _,err = serialize.save(t,path)
-	if err then return false,err end
+	if err then return nil,err end
 	
 	local atlaspath = removeUpDirectory(dir..t.atlasname..DEFAULT_ATLAS_EXTENSION)
 	return l.saveAtlas(map.atlas,atlaspath)

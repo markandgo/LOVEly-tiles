@@ -348,12 +348,12 @@ local function getTilesetBuildMap(gid,tmxmap,layer)
 			chosen = tileset
 		end
 	end
-	local tileset = chosen
-	local map     = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
+	local tileset  = chosen
+	local map      = mapnew(tileset.image,tileset.atlas,tmxmap.tilewidth,tmxmap.tileheight)
 	applyTmxStyleToDraw(map)
-	map.imagename = tileset.source
-	map.properties= layer.properties
-	map.opacity   = layer.opacity
+	map.imagesource= tileset.source
+	map.properties = layer.properties
+	map.opacity    = layer.opacity
 	map:setViewRange(1,1,tmxmap.width,tmxmap.height)
 	return tileset,map
 end

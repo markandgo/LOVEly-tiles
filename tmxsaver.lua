@@ -42,7 +42,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 		local iw,ih  = atlas:getImageSize()
 		local image  = {
 			__element= 'image',
-			source   = layer:getImageName(),
+			source   = layer:getImageSource(),
 			width    = iw,
 			height   = ih,
 		}

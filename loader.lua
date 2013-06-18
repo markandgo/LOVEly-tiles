@@ -90,26 +90,26 @@ function l.loadAtlas(path)
 end
 
 function l.saveMap(map,path)
-	if not map.imagename then 
-		return nil,'Must specify a relative image path (map.imagename)!' 
+	if not map.imagesource then 
+		return nil,'Must specify a source image!' 
 	end
 	
 	path              = stripExcessSlash(path)
 	local class       = getmetatable(map)
 	local dir,name,ext= getPathComponents(path)
 	
-	if not love.filesystem.exists( removeUpDirectory(dir..map.imagename) ) then 
+	if not love.filesystem.exists( removeUpDirectory(dir..map.imagesource) ) then 
 		return nil,'File does not exist for image path!' 
 	end
 	
 	local t = {
-		tw       = map.tw,
-		th       = map.th,
-		imagename= map.imagename,
-		atlasname= map.atlas.name or name,
-		layername= map.layername,
-		maparray = map:export(1),
-		type     = class == isomap and 'isometric' or 'orthogonal'
+		tw         = map.tw,
+		th         = map.th,
+		imagesource= map.imagesource,
+		atlasname  = map.atlas.name or name,
+		layername  = map.layername,
+		maparray   = map:export(1),
+		type       = class== isomap and 'isometric' or 'orthogonal'
 	}
 	
 	local grid  = map.tilegrid
@@ -155,10 +155,10 @@ function l.loadMap(path)
 	
 	if not t then return nil,'No file was found for the specified path' end
 	
-	local imagename   = removeUpDirectory( dir..t.imagename )
-	local image       = cachedImages[imagename] or love.graphics.newImage( imagename )
+	local imagesource = removeUpDirectory( dir..t.imagesource )
+	local image       = cachedImages[imagesource] or love.graphics.newImage( imagesource )
 	
-	cachedImages[imagename] = image
+	cachedImages[imagesource] = image
 	
 	local atlas      = l.loadAtlas(t.atlasname..DEFAULT_ATLAS_EXTENSION)
 	local maptype    = t.type
@@ -167,7 +167,7 @@ function l.loadMap(path)
 	local maparray   = t.maparray
 	local maptilegrid= mapobject.tilegrid
 	
-	mapobject:setImageName(t.imagename)
+	mapobject:setImageSource(t.imagesource)
 	mapobject:setViewRange(1,1,maparray.width,maparray.height)
 	mapobject:setLayerName(t.layername)
 	

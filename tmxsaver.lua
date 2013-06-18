@@ -307,7 +307,7 @@ local function prepareTable(drawlist,path)
 				height   = layer.height,
 				{
 					__element= 'image',
-					source   = layer.imagename,
+					source   = layer.source,
 					trans    = layer.trans,
 				},
 				prepareTableProperties(layer.properties),

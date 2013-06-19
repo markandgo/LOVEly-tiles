@@ -22,17 +22,17 @@ function t:getLayer(name)
 	return self.settings[name] and self.settings[name].layer
 end
 
-function t:insert(name,layer,xtransfactor,ytransfactor,isDrawable)
-	xtransfactor= xtransfactor or 1
-	ytransfactor= ytransfactor or xtransfactor
+function t:insert(name,layer,xtranscale,ytranscale,isDrawable)
+	xtranscale= xtranscale or 1
+	ytranscale= ytranscale or xtranscale
 	table.insert(self.layers,layer)
-	local t        = self.settings[name] or {}
-	self.settings[name]  = t
-	self.settings[layer] = t
-	t.isDrawable   = isDrawable == nil and true or isDrawable
-	t.xtransfactor = xtransfactor
-	t.ytransfactor = ytransfactor
-	t.layer        = layer
+	local t             = self.settings[name] or {}
+	self.settings[name] = t
+	self.settings[layer]= t
+	t.isDrawable        = isDrawable== nil and true or isDrawable
+	t.xtranscale        = xtranscale
+	t.ytranscale        = ytranscale
+	t.layer             = layer
 end
 
 function t:remove(name)
@@ -109,13 +109,13 @@ function t:getTranslation()
 	return self.x,self.y
 end
 
-function t:setTransFactors(name,xfactor,yfactor)
-	self.settings[name].xtransfactor = xfactor
-	self.settings[name].ytransfactor = yfactor or xfactor
+function t:setTranslationScale(name,xscale,yscale)
+	self.settings[name].xtranscale = xscale
+	self.settings[name].ytranscale = yscale or xscale
 end
 
-function t:getTransFactors(name)
-	return self.settings[name].xtransfactor, self.settings[name].ytransfactor
+function t:getTranslationScale(name)
+	return self.settings[name].xtranscale, self.settings[name].ytranscale
 end
 
 function t:iterate()
@@ -133,9 +133,9 @@ function t:draw(...)
 	local set   = self.settings
 	for i,layer in ipairs(self.layers) do
 		love.graphics.push()
-		local xfactor = self.settings[layer].xtransfactor
-		local yfactor = self.settings[layer].ytransfactor
-		local dx,dy   = xfactor*self.x, yfactor*self.y
+		local xscale = self.settings[layer].xtranscale
+		local yscale = self.settings[layer].ytranscale
+		local dx,dy  = xscale*self.x, yscale*self.y
 		love.graphics.translate(dx,dy)
 		if set[layer].isDrawable then
 			if layer.draw then layer:draw(...) end

@@ -200,11 +200,11 @@ function l.saveDrawList(drawlist,path)
 		local settings = drawlist.settings[layer]
 		local layername= layer.layername or name..'_layer_'..i
 		layers[i] = {
-			isDrawable  = settings.isDrawable,
-			xtransfactor= settings.xtransfactor,
-			ytransfactor= settings.ytransfactor,
-			layername   = layername,
-			isDummy     = nil,
+			isDrawable= settings.isDrawable,
+			xtranscale= settings.xtranscale,
+			ytranscale= settings.ytranscale,
+			layername = layername,
+			isDummy   = nil,
 		}
 		local class    = getmetatable(layer)
 		if class == map or class == isomap then
@@ -236,7 +236,7 @@ function l.loadDrawList(path)
 			local mappath = removeUpDirectory(dir..layer.layername..DEFAULT_MAP_EXTENSION)
 			newlayer      = l.loadMap(mappath)
 		end
-		dl:insert(newlayer.layername or layer.layername,newlayer,layer.xtransfactor,layer.ytransfactor,layer.isDrawable)
+		dl:insert(newlayer.layername or layer.layername,newlayer,layer.xtranscale,layer.ytranscale,layer.isDrawable)
 	end
 	return dl
 end

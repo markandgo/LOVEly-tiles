@@ -34,7 +34,12 @@ end
 
 local getq = function(self,index)
 	local cell = grid.get(self,indexToCoord(self,index))
-	return cell and cell.quad or error ('Atlas index is out of range')
+	if cell then return cell.quad
+	else
+		local gx,gy = indexToCoord(self,index)
+		index       = (gy - 1) * self:getColumns() + gx
+		error('Atlas index is out of range: '..string.format('%s (%s,%s)',index,gx,gy))
+	end
 end
 
 -------------------

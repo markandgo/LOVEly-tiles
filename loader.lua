@@ -63,7 +63,7 @@ function l.saveAtlas(atlas,path)
 		xs        = atlas.xs,
 		ys        = atlas.ys,
 		properties= grid.new(),
-		atlasname = atlas.atlasname,
+		atlasname = atlas:getName(),
 	}
 	for x,y,v in grid.iterate(atlas) do
 		if v.property then
@@ -106,7 +106,7 @@ function l.saveMap(map,path)
 		tw         = map.tw,
 		th         = map.th,
 		imagesource= map.imagesource,
-		atlasname  = map.atlas.name or name,
+		atlasname  = map.atlas:getName() or name,
 		layername  = map.layername,
 		maparray   = map:export(1),
 		viewrange  = {map:getViewRange()},

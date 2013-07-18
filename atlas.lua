@@ -144,12 +144,12 @@ end
 -- ####################################
 
 function atlas:getTileOffsets()
-	local to = self.atlas.tileoffset
+	local to = self.tileoffset
 	return to.x,to.y
 end
 
 function atlas:setTileOffsets(x,y)
-	local to = self.atlas.tileoffset
+	local to = self.tileoffset
 	to.x,to.y= x,y
 end
 

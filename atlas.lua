@@ -77,6 +77,9 @@ function atlas.new(imageWidth,imageHeight,  quadWidth,quadHeight,  atlasWidth,at
 	self.iHeight   = imageHeight
 	self.atlasname = nil
 	
+	self.tileoffset= {}
+	self.properties= {}
+	
 	for gx = 1,dx do 
 		for gy = 1,dy do
 			local tile = {
@@ -150,7 +153,7 @@ end
 
 function atlas:setTileOffsets(x,y)
 	local to = self.tileoffset
-	to.x,to.y= x,y
+	to.x,to.y= x or 0,y or 0
 end
 
 function atlas:getTilesetProperty(name)

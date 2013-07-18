@@ -10,10 +10,13 @@ t.__index = t
 
 function t.new()
 	local d = {
-		layers   = {},
-		settings = {},
-		x        = 0,
-		y        = 0,
+		layers    = {},
+		settings  = {},
+		x         = 0,
+		y         = 0,
+		
+		properties= {},
+		atlases   = {},
 	}
 	return setmetatable(d,t)
 end

@@ -89,6 +89,8 @@ function map.new(image,atlas, tw,th)
 	self.tw         = tw
 	self.th         = th
 	
+	self.properties = {}
+	
 	return setmetatable(self,map)
 end
 

@@ -91,16 +91,12 @@ end
 
 function l.saveMap(map,path)
 	if not map.imagesource then 
-		return nil,'Must specify a source image!' 
+		return nil,'Must specify map.imagesource to image path!'
 	end
 	
 	path              = stripExcessSlash(path)
 	local class       = getmetatable(map)
 	local dir,name,ext= getPathComponents(path)
-	
-	if not love.filesystem.exists( removeUpDirectory(dir..map.imagesource) ) then 
-		return nil,'File does not exist for image path!' 
-	end
 	
 	local t = {
 		tw         = map.tw,

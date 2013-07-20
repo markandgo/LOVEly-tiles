@@ -142,14 +142,12 @@ local getFlipBits = function(x,y,layer)
 end
 
 local makeAndInsertTileLayer = function(drawlist,i,layer,layers,atlasDone)
-	local data = layer:export(2,true)
+	local data    = layer:export(2,true)
+	local firstgid= atlasDone[ layer:getAtlas() ]
 		
 	for y,t in ipairs(data) do
 		for x,index in ipairs(t) do
 			if index ~= 0 then
-				local atlas    = layer:getAtlas()
-				local firstgid = atlasDone[ atlas ]
-				
 				local flipbits= getFlipBits(x,y,layer)
 				local gid     = firstgid + (index - 1) + flipbits
 				data[y][x]    = gid

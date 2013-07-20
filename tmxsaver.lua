@@ -1,5 +1,4 @@
 local path      = (...):match('^.+[%.\\/]') or ''
-local mapdata   = require(path..'mapdata')
 local map       = require(path..'map')
 local isomap    = require(path..'isomap')
 -- ==============================================
@@ -143,36 +142,35 @@ local getFlipBits = function(x,y,layer)
 end
 
 local makeAndInsertTileLayer = function(drawlist,i,layer,layers,atlasDone)
-	local firstgid= atlasDone[ layer:getAtlas() ]
-	local data    = layer:export(1)
-	
-	for x,y,index in mapdata.array(data,data.width,data.height) do
-		if index ~= 0 then
-			local flipbits= getFlipBits(x,y,layer)
-			local gid     = index + firstgid-1 + flipbits
-			local i       = (y-1)*data.width+x
-			data[i]       = gid
+	local data = layer:export(2,true)
+		
+	for y,t in ipairs(data) do
+		for x,index in ipairs(t) do
+			if index ~= 0 then
+				local atlas    = layer:getAtlas()
+				local firstgid = atlasDone[ atlas ]
+				
+				local flipbits= getFlipBits(x,y,layer)
+				local gid     = firstgid + (index - 1) + flipbits
+				data[y][x]    = gid
+			end
 		end
 	end
 	
-	local rows = {}
-	for i = 1,#data,data.width do
-		table.insert(rows,table.concat(data,',',i,i+data.width-1))
-	end
-	local formatteddata = {__element = 'data',encoding = 'csv'; table.concat(rows,',\n')}
+	local preparedData = {__element = 'data',encoding = 'csv'; data}
 	
 	local formattedlayer = {
 		__element= 'layer',
 		name     = layer:getName() or ('layer '..i),
 		visible  = drawlist:isDrawable(layer:getName()) and 1 or 0,
-		data     = formatteddata,
+		data     = preparedData,
 		width    = data.width,
 		height   = data.height,
 		opacity  = layer.opacity,
 		
 		prepareTableProperties(layer.properties),
 	}
-	table.insert(formattedlayer,formatteddata)
+	table.insert(formattedlayer,preparedData)
 	table.insert(layers,formattedlayer)
 end
 
@@ -226,6 +224,44 @@ local makeAndInsertObjGroup = function(layer,layers)
 	end
 	
 	table.insert(layers,copy)
+end
+
+local function equalizeLayerSize(tmxmap,layers)
+	local mw,mh = 0,0
+	for i,layer in ipairs(layers) do
+		mw,mh = math.max(layer.width,mw),math.max(layer.height,mh)
+	end
+	tmxmap.width,tmxmap.height = mw,mh
+	
+	for i,layer in ipairs(layers) do
+		layer.width = mw; layer.height = mh
+		if layer.__element == 'layer' then
+			local data = layer.data[1]
+			local w    = #data[1]
+			
+			local extra_row = {}
+			for i = 1,mw do
+				table.insert(extra_row,0)
+			end
+			
+			local rows = {}
+			for y = 1,mh do
+				local row = data[y]
+				if not row then
+					row = extra_row
+				else
+					for x = mw,w+1,-1 do
+						row[x] = 0
+					end
+				end
+				data[y] = extra_row
+				table.insert( rows, table.concat(row,',') )
+			end
+			
+			layer.data[1] = table.concat( rows, ',\n' )
+			layer.data    = nil
+		end
+	end
 end
 
 -- ==============================================
@@ -291,11 +327,7 @@ local function prepareTable(drawlist,path)
 		end
 	end
 	
-	local mw,mh = 0,0
-	for i,layer in ipairs(layers) do
-		mw,mh = math.max(layer.width,mw),math.max(layer.height,mh)
-	end
-	tmxmap.width,tmxmap.height = mw,mh
+	equalizeLayerSize(tmxmap,layers)
 	
 	for i,tileset in ipairs(tilesets) do
 		table.insert(tmxmap,tileset)

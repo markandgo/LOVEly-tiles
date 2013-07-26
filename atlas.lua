@@ -156,12 +156,8 @@ function atlas:setTileOffsets(x,y)
 	to.x,to.y= x or 0,y or 0
 end
 
-function atlas:getTilesetProperty(name)
-	return self.properties[name]
-end
-
-function atlas:setTilesetProperty(name,value)
-	self.properties[name] = value
+function atlas:getLayerProperties()
+	return self.properties
 end
 
 return atlas

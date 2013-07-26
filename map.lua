@@ -267,12 +267,8 @@ function map:setOpacity(opacity)
 	self.opacity = opacity
 end
 
-function map:getLayerProperty(name)
-	return self.properties[name]
-end
-
-function map:setLayerProperty(name,value)
-	self.properties[name] = value
+function map:getLayerProperties()
+	return self.properties
 end
 
 return map

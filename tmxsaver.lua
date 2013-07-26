@@ -52,7 +52,7 @@ local makeAndInsertTileset = function(layer,atlasDone,tilesets,firstgid)
 			for x = 1,cols do
 				local index = (y-1)*cols+x
 				local prop  = atlas:getqProperty(index)
-				if prop then
+				if type(prop) == 'table' then
 					local id   = index-1
 					local tile = {
 						__element = 'tile',

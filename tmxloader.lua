@@ -275,13 +275,13 @@ flipx flipy diagflip --> flipx flipy angle -- or --> flipx flipy angle
 end
 
 local function buildImage(tmxmap,parent)
-	local imagetable= parent.image
-	local source    = stripExcessSlash(  removeUpDirectory(tmxmap.path..imagetable.source)  )
-	local image     = imageCache[source] or love.graphics.newImage(source)
-	imageCache[path]= image
-	parent.image    = image
-	parent.source   = imagetable.source
-	parent.trans    = imagetable.trans
+	local imagetable  = parent.image
+	local source      = stripExcessSlash(  removeUpDirectory(tmxmap.path..imagetable.source)  )
+	local image       = imageCache[source] or love.graphics.newImage(source)
+	imageCache[source]= image
+	parent.image      = image
+	parent.source     = imagetable.source
+	parent.trans      = imagetable.trans
 end
 
 local function mergeExternalTSX(tmxmap,tileset)

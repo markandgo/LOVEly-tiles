@@ -4,20 +4,11 @@ local ceil  = math.ceil
 local path  = (...):match('^.+[%.\\/]') or ''
 local grid  = require (path..'grid')
 
-local getTopLeftVertex = function(atlas,quad)
-	return quad:getViewport()
-end
-
 -- ##########################
 -- 0.9.0 COMPATIBILITY
 
-if love.graphics.newGeometry then
-	drawq = love.graphics.drawg
-	getTopLeftVertex = function(atlas,quad)
-		local _,_,u,v = quad:getVertex(1)
-		local iw,ih   = atlas:getImageSize()
-		return u*iw,v*ih
-	end
+if not drawq  then
+	drawq = love.graphics.draw
 end
 
 -- ##########################
@@ -118,7 +109,7 @@ end
 
 function atlas:getqViewport(index)
 	local quad = getq(self,index)
-	local x,y  = getTopLeftVertex(self,quad)
+	local x,y  = quad:getViewport()
 	return x,y,atlas.getqSize(self)
 end
 

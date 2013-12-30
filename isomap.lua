@@ -9,8 +9,10 @@ local sqrt  = math.sqrt
 local floor = math.floor
 local max   = math.max
 local lg    = love.graphics
-local sbadd = love.graphics.newGeometry and 'addg' or 'addq'
-local sbset = love.graphics.newGeometry  and 'setg' or 'setq'
+
+-- 0.9/0.8 compatibility
+local sbadd = love.graphics.drawq and 'addq' or 'add'
+local sbset = love.graphics.drawq and 'setq' or 'set'
 
 local dummyquad = lg.newQuad(0,0,1,1,1,1)
 

@@ -7,6 +7,8 @@ function s:load()
 	kirby = gr.newImage('kirby.png')
 	foreground = gr.newQuad(6,419,577,216,787,641)
 	background = gr.newQuad(3,230,415,171,787,641)
+	
+	drawq = love.graphics.drawq or love.graphics.draw
 		
 	--[[######################
 	DEFINE LAYER AND DRAW CALLBACK
@@ -14,12 +16,12 @@ function s:load()
 		
 	local layer1 = {}	
 	layer1.draw = function(self,...) 
-		gr.drawq(kirby,background,50,50)
+		drawq(kirby,background,50,50)
 	end
 	
 	local layer2 = {}
 	layer2.draw = function(self,...) 
-		gr.drawq(kirby,foreground,0,0) 
+		drawq(kirby,foreground,0,0) 
 	end
 	
 	--[[######################
